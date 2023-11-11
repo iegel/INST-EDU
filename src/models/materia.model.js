@@ -1,25 +1,20 @@
 import mongoose from 'mongoose'
 
 const materiaSchema = new mongoose.Schema({
-    materia:{
+    nombreMateria: {
         type: String,
         required: true
     },
-    profesor:{
+    docente: {
         type: String,
-        required:true
+        required: true
     },
-    horas:{
-        type: String,
-        required:true
-    },
-    año:{
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'Año', // Con esta linea y con la de arriba indico que hace referencia a otro modelo
-        required : true
+    comision: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comision',
+        required: true
     }
-},
-{
+}, {
     timestamps: true
 });
 

@@ -20,7 +20,7 @@ function AlumnosFormPage() {
         setValue('nombre', alumno.nombre);
         setValue('apellido', alumno.apellido);
         setValue('dni', alumno.dni);
-        setValue('año', alumno.año);
+        setValue('comision', alumno.comision);
       }
     }
     loadAlumno();
@@ -49,8 +49,8 @@ function AlumnosFormPage() {
         <label htmlFor="dni" style={{ color: 'black' }}>DNI</label>
         <Input placeholder="DNI" style={{ width: '100%', marginBottom: '12px' }} {...register('dni')} />
 
-        <label htmlFor="año" style={{ color: 'black' }}>Año</label>
-        <Input placeholder="Año" style={{ width: '100%', marginBottom: '12px' }} {...register('año')} />
+        <label htmlFor="comision" style={{ color: 'black' }}>Comision</label>
+        <Input placeholder="Comision" style={{ width: '100%', marginBottom: '12px' }} {...register('comision')} />
 
         <Button type="primary" htmlType="submit" style={{ background: '#1890ff', borderRadius: '4px' }}>
           Guardar

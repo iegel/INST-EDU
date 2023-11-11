@@ -30,9 +30,9 @@ function AlumnosPage() {
       key: 'dni',
     },
     {
-      title: 'Año',
-      dataIndex: 'año',
-      key: 'año',
+      title: 'Comision',
+      dataIndex: 'comision',
+      key: 'comision',
     },
     {
       title: 'Action',

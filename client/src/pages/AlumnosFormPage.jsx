@@ -20,7 +20,7 @@ const AlumnosFormPage = () => {
           nombre: alumno.nombre,
           apellido: alumno.apellido,
           dni: alumno.dni,
-          año: alumno.año
+          comision: alumno.comision
         });
 
       }
@@ -72,8 +72,8 @@ const AlumnosFormPage = () => {
           <Input {...register('dni')} placeholder="DNI" />
         </Form.Item>
 
-        <Form.Item label="Año" name="año" rules={[{ required: true, message: 'Año obligatorio' }]}>
-          <Input {...register('año')} placeholder="Año" />
+        <Form.Item label="Comision" name="comision" rules={[{ required: true, message: 'Comision obligatoria' }]}>
+          <Input {...register('comision')} placeholder="Comision" />
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
