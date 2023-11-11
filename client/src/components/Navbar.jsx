@@ -12,21 +12,21 @@ function Navbar() {
   return (
     <Header style={{ background: '#1677FF', display: 'flex', justifyContent: 'space-between' }}>
       <div>
-        <Link to={isAuthenticated ? '/alumnoss' : '/'}>
+        <Link to={isAuthenticated ? '/alumnos' : '/'}>
           <h1 style={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>Instituto Educativo</h1>
         </Link>
       </div>
       {isAuthenticated ? (
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
+        <Menu theme="dark" mode="horizontal" selectedKeys={['1']}>
           <Menu.Item key="1">
-          <Link to="/alumnos">Alumnos</Link>
+            <Link to="/alumnos">Alumnos</Link>
           </Menu.Item>
           <Menu.Item key="2">
             <Link to="/add-alumno">Registar alumno</Link>
           </Menu.Item>
           <Menu.Item key="3">
             <Link to="/materias">Materias</Link>
-          </Menu.Item>          
+          </Menu.Item>
           <Menu.Item key="4" onClick={logout}>
             Salir
           </Menu.Item>

@@ -25,6 +25,7 @@ export default function AlumnosProvider({children}) {
       }
     }
     const createAlumno = async (alumno) =>{
+      console.log(alumno)
       const res = await createAlumnosRequest(alumno)
       console.log(res)
     }

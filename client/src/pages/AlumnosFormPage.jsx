@@ -1,64 +1,89 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAlumnos } from '../context/AlumnosContext';
 import { useNavigate, useParams } from 'react-router-dom';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import { DatePicker, Input, Button } from 'antd'; // Importa los componentes de Ant Design
-dayjs.extend(utc);
+import { Input, Button, Form } from 'antd';
 
-function AlumnosFormPage() {
-  const { register, handleSubmit, setValue } = useForm();
+const AlumnosFormPage = () => {
+  const { register,setValue} = useForm();
   const { createAlumno, getAlumno, updateAlumno } = useAlumnos();
   const navigate = useNavigate();
   const params = useParams();
+  const [form] = Form.useForm();
 
-  useEffect(() => {
+  useEffect(()=>{
     async function loadAlumno() {
-      if (params.id) {
+      if (params.id){
         const alumno = await getAlumno(params.id);
-        getAlumno(params.id);
-        setValue('nombre', alumno.nombre);
-        setValue('apellido', alumno.apellido);
-        setValue('dni', alumno.dni);
-        setValue('año', alumno.año);
+        getAlumno(params.id)
+        form.setFieldsValue({
+          nombre: alumno.nombre,
+          apellido: alumno.apellido,
+          dni: alumno.dni,
+          año: alumno.año
+        });
+
       }
     }
-    loadAlumno();
-  }, []);
-
-  const onSubmit = handleSubmit((data) => {
+    loadAlumno()
+  },[])
 
 
+  const onFinish = (values) => {
     if (params.id) {
-      updateAlumno(params.id, data);
+      updateAlumno(params.id, values);
     } else {
-      createAlumno(data);
+      console.log(values);
+      createAlumno(values);
     }
     navigate('/alumnos');
-  });
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
 
   return (
     <div style={{ background: '#f0f2f5', maxWidth: '400px', padding: '20px', borderRadius: '8px' }}>
-      <form onSubmit={onSubmit}>
-        <label htmlFor="nombre" style={{ color: 'black' }}>Nombre</label>
-        <Input placeholder="Nombre" {...register('nombre')} style={{ width: '100%', marginBottom: '12px'}} autoFocus />
+      <Form
+        name="alumnosForm"
+        labelCol={{
+          span: 8,
+        }}
+        wrapperCol={{
+          span: 16,
+        }}
+        initialValues={{
+          remember: true,
+      }}
+        form={form}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
+        <Form.Item label="Nombre" name="nombre">
+          <Input {...register('nombre')} placeholder="Nombre" autoFocus />
+        </Form.Item>
 
-        <label htmlFor="apellido" style={{ color: 'black' }}>Apellido</label>
-        <Input placeholder="Apellido" {...register('apellido')} style={{ width: '100%', marginBottom: '12px' }} />
+        <Form.Item label="Apellido" name="apellido">
+          <Input {...register('apellido')} placeholder="Apellido" />
+        </Form.Item>
 
-        <label htmlFor="dni" style={{ color: 'black' }}>DNI</label>
-        <Input placeholder="DNI" style={{ width: '100%', marginBottom: '12px' }} {...register('dni')} />
+        <Form.Item label="DNI" name="dni">
+          <Input {...register('dni')} placeholder="DNI" />
+        </Form.Item>
 
-        <label htmlFor="año" style={{ color: 'black' }}>Año</label>
-        <Input placeholder="Año" style={{ width: '100%', marginBottom: '12px' }} {...register('año')} />
+        <Form.Item label="Año" name="año">
+          <Input {...register('año')} placeholder="Año" />
+        </Form.Item>
 
-        <Button type="primary" htmlType="submit" style={{ background: '#1890ff', borderRadius: '4px' }}>
-          Guardar
-        </Button>
-      </form>
+        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Button type="primary" htmlType="submit" style={{ background: '#1890ff', borderRadius: '4px' }}>
+            Guardar
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
-}
+};
 
 export default AlumnosFormPage;
