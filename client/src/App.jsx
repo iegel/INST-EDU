@@ -7,6 +7,9 @@ import AlumnoFormPage from "./pages/AlumnosFormPage";
 import PotectedRoute from "./PotectedRoute";
 import AlumnoProvider from "./context/AlumnosContext";
 import Navbar from "./components/Navbar";
+import { ConfigProvider } from 'antd';
+import esES from 'antd/lib/locale/es_ES';
+
 //test
 function App() {
   return (

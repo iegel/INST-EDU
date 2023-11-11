@@ -60,19 +60,19 @@ const AlumnosFormPage = () => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <Form.Item label="Nombre" name="nombre">
+        <Form.Item label="Nombre" name="nombre" rules={[{ required: true, message: 'Nombre obligatorio' }]}>
           <Input {...register('nombre')} placeholder="Nombre" autoFocus />
         </Form.Item>
 
-        <Form.Item label="Apellido" name="apellido">
+        <Form.Item label="Apellido" name="apellido" rules={[{ required: true, message: 'Apellido obligatorio' }]}>
           <Input {...register('apellido')} placeholder="Apellido" />
         </Form.Item>
 
-        <Form.Item label="DNI" name="dni">
+        <Form.Item label="DNI" name="dni" rules={[{ required: true, message: 'DNI obligatorio' }]}>
           <Input {...register('dni')} placeholder="DNI" />
         </Form.Item>
 
-        <Form.Item label="Año" name="año">
+        <Form.Item label="Año" name="año" rules={[{ required: true, message: 'Año obligatorio' }]}>
           <Input {...register('año')} placeholder="Año" />
         </Form.Item>
 

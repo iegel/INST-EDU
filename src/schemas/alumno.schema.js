@@ -7,9 +7,10 @@ export const createAlumnoSchema = z.object({
     apellido: z.string({
         required_error: 'Apellido obligatorio',
     }),
-    dni: z.string({
-        required_error: 'DNI obligatorio',
-    }), 
+    dni: z.number()
+    .refine((value) => Number.isInteger(value) && value.toString().length === 8, {
+        message: 'El DNI debe ser un número entero de 8 dígitos',
+    }),
     año: z.string({
         required_error: 'Año obligatorio',
     }), // Agregamos el campo año como número entero

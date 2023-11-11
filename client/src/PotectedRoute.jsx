@@ -1,7 +1,8 @@
 import React from 'react'
 import { useAuth } from './context/AuthContext'
 import { Navigate, Outlet } from 'react-router-dom'
-
+import { ConfigProvider } from 'antd';
+import esES from 'antd/lib/locale/es_ES';
 function PotectedRoute() {
     const {loading,isAuthenticated} = useAuth()
 
