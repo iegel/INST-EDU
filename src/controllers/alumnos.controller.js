@@ -11,9 +11,9 @@ export const getAlumnos = async (req,res) =>{
 
 export const createAlumno = async (req,res) =>{
     try{
-        console.log(req.data)
+//        console.log(req.data)
         const {nombre, apellido,dni,comision} = req.body
-        console.log(req.nombre)
+//        console.log(req.nombre)
         const newAlumno= new Alumno({
         nombre,
         apellido,
@@ -44,7 +44,7 @@ export const updateAlumno = async (req,res) =>{
         const alumno = await Alumno.findByIdAndUpdate(req.params.id,req.body, {
             new: true
         }) //El new true es para que abajo me devuelva el dato nuevo
-        if (!alumno) return res.status(404).json({message : "Usuario no encontradp"})
+        if (!alumno) return res.status(404).json({message : "Usuario no encontrado"})
         res.json(alumno) 
     }catch(error){
         return res.status(404).json({message: "Usuario no encontrado"})        

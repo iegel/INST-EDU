@@ -27,13 +27,31 @@ function Navbar() {
               <Link to="/add-alumno">Crear Alumno</Link>
             </Menu.Item>
           </SubMenu>
-          <Menu.Item key="3">
-            <Link to="/materias">Materias</Link>
-          </Menu.Item>
-          <Menu.Item key="4">
-            <Link to="/add-usuario">Crear usuario</Link>
-          </Menu.Item>
-          <Menu.Item key="5" onClick={logout}>
+          <SubMenu key="materias" title="Materias">
+            <Menu.Item key="3">
+              <Link to="/materias">Lista de Materias</Link>
+            </Menu.Item>
+            <Menu.Item key="4">
+              <Link to="/add-materia">Crear Materia</Link>
+            </Menu.Item>
+          </SubMenu>
+          <SubMenu key="comisiones" title="Comisiones">
+            <Menu.Item key="5">
+              <Link to="/comisiones">Lista de Comisiones</Link>
+            </Menu.Item>
+            <Menu.Item key="6">
+              <Link to="/add-comision">Crear Comision</Link>
+            </Menu.Item>
+          </SubMenu>
+          <SubMenu key="usuarios" title="Usuarios">
+            <Menu.Item key="7">
+              <Link to="/usuarios">Lista de Usuarios</Link>
+            </Menu.Item>
+            <Menu.Item key="8">
+              <Link to="/add-usuario">Crear Usuario</Link>
+            </Menu.Item>
+          </SubMenu>
+          <Menu.Item key="10" onClick={logout}>
             Salir
           </Menu.Item>
         </Menu>

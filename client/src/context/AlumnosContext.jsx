@@ -7,7 +7,7 @@ const AlumnoContext = createContext();
 export const useAlumnos = () => {
     const context = useContext(AlumnoContext);
     if (!context){
-        throw new Error("useTasks must be used within a TaskProvider");
+        throw new Error("useAlumnos must be used within a AlumnosProvider");
     }
 
     return context;

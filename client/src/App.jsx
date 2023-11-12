@@ -6,6 +6,12 @@ import AlumnosPage from "./pages/AlumnosPage";
 import AlumnoFormPage from "./pages/AlumnosFormPage";
 import PotectedRoute from "./PotectedRoute";
 import AlumnoProvider from "./context/AlumnosContext";
+import MateriasPage from "./pages/MateriasPage";
+import MateriaFormPage from "./pages/MateriasFormPage";
+import MateriaProvider from "./context/MateriasContext";
+import ComisionesPage from "./pages/ComisionesPage";
+import ComisionFormPage from "./pages/ComisionesFormPage";
+import ComisionProvider from "./context/ComisionesContext";
 import Navbar from "./components/Navbar";
 import UsuariosFormPage from "./pages/UsuariosFormPage";
 import { ConfigProvider } from 'antd';
@@ -16,20 +22,31 @@ function App() {
   return (
     <AuthProvider>
       <AlumnoProvider>
-        <BrowserRouter >
-          <main className="container mx-auto px-10">
-            <Navbar />
-            <Routes>
-              <Route path='/' element={<LoginPage />} />
-              <Route element={<PotectedRoute />}>
-                <Route path='/alumnos' element={<AlumnosPage />} />
-                <Route path='/add-alumno' element={<AlumnoFormPage />} />
-                <Route path='/alumnos/:id' element={<AlumnoFormPage />} />
-                <Route path='/add-usuario' element={<UsuariosFormPage />} />
-              </Route>
-            </Routes>
-          </main>
-        </BrowserRouter>
+        <MateriaProvider>
+          <ComisionProvider>
+            <BrowserRouter >
+              <main className="container mx-auto px-10">
+                <Navbar />
+                <Routes>
+                  <Route path='/' element={<LoginPage />} />
+                  <Route element={<PotectedRoute />}>
+                    <Route path='/alumnos' element={<AlumnosPage />} />
+                    <Route path='/add-alumno' element={<AlumnoFormPage />} />
+                    <Route path='/alumnos/:id' element={<AlumnoFormPage />} />
+                    <Route path='/materias' element={<MateriasPage />} />
+                    <Route path='/add-materia' element={<MateriaFormPage />} />
+                    <Route path='/materias/:id' element={<MateriaFormPage />} />
+                    <Route path='/comisiones' element={<ComisionesPage />} />
+                    <Route path='/add-comision' element={<ComisionFormPage />} />
+                    <Route path='/comisiones/:id' element={<ComisionFormPage />} />
+                    <Route path='/add-usuario' element={<UsuariosFormPage />} />
+
+                  </Route>
+                </Routes>
+              </main>
+            </BrowserRouter>
+          </ComisionProvider>
+        </MateriaProvider>
       </AlumnoProvider>
     </AuthProvider>
   )

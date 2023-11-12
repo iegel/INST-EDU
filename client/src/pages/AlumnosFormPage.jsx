@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Input, Button, Form } from 'antd';
 
 const AlumnosFormPage = () => {
-  const { register, setValue } = useForm();
+  const { register } = useForm();
   const { createAlumno, getAlumno, updateAlumno } = useAlumnos();
   const navigate = useNavigate();
   const params = useParams();
