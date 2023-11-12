@@ -21,7 +21,6 @@ function App() {
             <Navbar />
             <Routes>
               <Route path='/' element={<LoginPage />} />
-              <Route path='/register' element={<RegisterPage />} />
               <Route element={<PotectedRoute />}>
                 <Route path='/alumnos' element={<AlumnosPage />} />
                 <Route path='/add-alumno' element={<AlumnoFormPage />} />
