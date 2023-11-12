@@ -42,12 +42,23 @@ export const login = async (req, res) => {
 //        console.log(email,password) //para ver que datos me llega desde el cliente (En formato json)
 
     try {
-        const userFound = await User.findOne({email}) //Si encontro el email
+        //const userFound = await User.findOne({email}) //Si encontro el email
+        const userFound = await User.findOne({email}, '+password')
         if (!userFound) return res.status(400).json({message : "User not found"});
+        const result = await userFound.checkPassword(password)
+        if (result.isLocked) {
+            console.error('User is locked. Sending 400 (Locked) to client')
+            return res.status(400).end()
+          }
+      
+          if (!result.isOk) {
+            console.error('User password is invalid. Sending 401 to client')
+            return res.status(401).end()
+          }
+       
+        //const isMatch = await bcrypt.compare(password,userFound.password) // Si coincide la password devuelve TRUE, sino FALSE
 
-        const isMatch = await bcrypt.compare(password,userFound.password) // Si coincide la password devuelve TRUE, sino FALSE
-
-        if (!isMatch) return res.status(400).json({message : "Incorrect password"}); // Si arriba devolvio FALSE lanzo mensaje de error
+        //if (!isMatch) return res.status(400).json({message : "Incorrect password"}); // Si arriba devolvio FALSE lanzo mensaje de error
 
         const token = await createAccesToken({id: userFound._id}) // Esto me va a guardar un token
 

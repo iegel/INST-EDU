@@ -5,6 +5,7 @@ import { Layout, Menu } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 const { Header } = Layout;
+const { SubMenu } = Menu;
 
 function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -17,17 +18,22 @@ function Navbar() {
         </Link>
       </div>
       {isAuthenticated ? (
-        <Menu theme="dark" mode="horizontal" selectedKeys={['1']}>
-          <Menu.Item key="1">
-            <Link to="/alumnos">Alumnos</Link>
-          </Menu.Item>
-          <Menu.Item key="2">
-            <Link to="/add-alumno">Registar alumno</Link>
-          </Menu.Item>
+        <Menu theme="dark" mode="horizontal">
+          <SubMenu key="alumnos" title="Alumnos">
+            <Menu.Item key="1">
+              <Link to="/alumnos">Lista de Alumnos</Link>
+            </Menu.Item>
+            <Menu.Item key="2">
+              <Link to="/add-alumno">Crear Alumno</Link>
+            </Menu.Item>
+          </SubMenu>
           <Menu.Item key="3">
             <Link to="/materias">Materias</Link>
           </Menu.Item>
-          <Menu.Item key="4" onClick={logout}>
+          <Menu.Item key="4">
+            <Link to="/add-usuario">Crear usuario</Link>
+          </Menu.Item>
+          <Menu.Item key="5" onClick={logout}>
             Salir
           </Menu.Item>
         </Menu>

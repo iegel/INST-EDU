@@ -10,8 +10,7 @@ const materiaSchema = new mongoose.Schema({
         required: true
     },
     comision: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comision',
+        type: String,
         required: true
     }
 }, {

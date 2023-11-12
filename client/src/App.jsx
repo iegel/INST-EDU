@@ -7,6 +7,7 @@ import AlumnoFormPage from "./pages/AlumnosFormPage";
 import PotectedRoute from "./PotectedRoute";
 import AlumnoProvider from "./context/AlumnosContext";
 import Navbar from "./components/Navbar";
+import UsuariosFormPage from "./pages/UsuariosFormPage";
 import { ConfigProvider } from 'antd';
 import esES from 'antd/lib/locale/es_ES';
 
@@ -25,6 +26,7 @@ function App() {
                 <Route path='/alumnos' element={<AlumnosPage />} />
                 <Route path='/add-alumno' element={<AlumnoFormPage />} />
                 <Route path='/alumnos/:id' element={<AlumnoFormPage />} />
+                <Route path='/add-usuario' element={<UsuariosFormPage />} />
               </Route>
             </Routes>
           </main>

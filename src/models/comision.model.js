@@ -1,10 +1,10 @@
-import mongoose from 'mongoose'
-
+import mongoose from 'mongoose';
 const comisionSchema = new mongoose.Schema({
     numeroComision: {
-        type: Number,
-        required: true
-    },
+        type: String, // Numero de comision
+        required: true,
+        unique: true
+      },
     preceptor: {
         type: String,
         required: true
@@ -13,4 +13,4 @@ const comisionSchema = new mongoose.Schema({
     timestamps: true
 });
 
-export default mongoose.model('Comision',comisionSchema)
+export default mongoose.model('Comision', comisionSchema);
