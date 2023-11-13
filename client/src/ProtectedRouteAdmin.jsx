@@ -9,7 +9,7 @@ function ProtectedRouteAdmin() {
     if (loading) return <h1>
         Loading...
     </h1>
-    if (!loading && !isAdmin) return <Navigate to='/' replace/> // Si no está autenticado que retorne al login
+    if (!loading && !isAdmin) return <Navigate to='/' replace/> // Si no está autenticado y no es admin que retorne al login
     return <Outlet/> ; //Para que continue con el componente de adentro
 }
 
