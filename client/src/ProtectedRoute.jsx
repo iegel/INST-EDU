@@ -3,7 +3,7 @@ import { useAuth } from './context/AuthContext'
 import { Navigate, Outlet } from 'react-router-dom'
 import { ConfigProvider } from 'antd';
 import esES from 'antd/lib/locale/es_ES';
-function PotectedRoute() {
+function ProtectedRoute() {
     const {loading,isAuthenticated} = useAuth()
 
     if (loading) return <h1>
@@ -13,4 +13,4 @@ function PotectedRoute() {
     return <Outlet/> ; //Para que continue con el componente de adentro
 }
 
-export default PotectedRoute
+export default ProtectedRoute

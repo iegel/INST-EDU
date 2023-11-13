@@ -4,7 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import { AuthProvider } from "./context/AuthContext";
 import AlumnosPage from "./pages/AlumnosPage";
 import AlumnoFormPage from "./pages/AlumnosFormPage";
-import PotectedRoute from "./PotectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
 import AlumnoProvider from "./context/AlumnosContext";
 import MateriasPage from "./pages/MateriasPage";
 import MateriaFormPage from "./pages/MateriasFormPage";
@@ -16,6 +16,7 @@ import Navbar from "./components/Navbar";
 import UsuariosFormPage from "./pages/UsuariosFormPage";
 import { ConfigProvider } from 'antd';
 import esES from 'antd/lib/locale/es_ES';
+import ProtectedRouteAdmin from "./ProtectedRouteAdmin";
 
 //test
 function App() {
@@ -29,7 +30,7 @@ function App() {
                 <Navbar />
                 <Routes>
                   <Route path='/' element={<LoginPage />} />
-                  <Route element={<PotectedRoute />}>
+                  <Route element={<ProtectedRoute />}>
                     <Route path='/alumnos' element={<AlumnosPage />} />
                     <Route path='/add-alumno' element={<AlumnoFormPage />} />
                     <Route path='/alumnos/:id' element={<AlumnoFormPage />} />
@@ -39,8 +40,9 @@ function App() {
                     <Route path='/comisiones' element={<ComisionesPage />} />
                     <Route path='/add-comision' element={<ComisionFormPage />} />
                     <Route path='/comisiones/:id' element={<ComisionFormPage />} />
-                    <Route path='/add-usuario' element={<UsuariosFormPage />} />
-
+                    <Route element={<ProtectedRouteAdmin />}>
+                      <Route path='/add-usuario' element={<UsuariosFormPage />} />
+                    </Route>
                   </Route>
                 </Routes>
               </main>
