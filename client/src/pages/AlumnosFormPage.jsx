@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAlumnos } from '../context/AlumnosContext';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Input, Button, Form } from 'antd';
+import { Input, Button, Form,Select  } from 'antd';
+
 
 const AlumnosFormPage = () => {
   const { register } = useForm();
@@ -10,6 +11,7 @@ const AlumnosFormPage = () => {
   const navigate = useNavigate();
   const params = useParams();
   const [form] = Form.useForm();
+  const { Option } = Select;
 
   useEffect(() => {
     async function loadAlumno() {

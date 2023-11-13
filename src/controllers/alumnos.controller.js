@@ -11,9 +11,9 @@ export const getAlumnos = async (req,res) =>{
 
 export const createAlumno = async (req,res) =>{
     try{
-//        console.log(req.data)
+        console.log(req.data)
         const {nombre, apellido,dni,comision} = req.body
-//        console.log(req.nombre)
+        console.log(req.nombre)
         const newAlumno= new Alumno({
         nombre,
         apellido,

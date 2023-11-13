@@ -35,7 +35,7 @@ function AlumnosPage() {
       key: 'comision',
     },
     {
-      title: 'Acciones',
+      title: 'Action',
       key: 'action',
       render: (_, record) => (
         <Space size="middle">

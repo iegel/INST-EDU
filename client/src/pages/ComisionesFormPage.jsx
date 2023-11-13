@@ -73,10 +73,6 @@ const ComisionesFormPage = () => {
             <Input {...register('preceptor')} placeholder="Preceptor" />
           </Form.Item>
 
-          <Form.Item label="Comision" name="comision" rules={[{ required: true, message: 'Comision obligatoria' }]}>
-            <Input {...register('comision')} placeholder="Comision" />
-          </Form.Item>
-
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit" style={{ background: '#1890ff', borderRadius: '4px' }}>
               Guardar

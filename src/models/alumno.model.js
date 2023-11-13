@@ -13,11 +13,6 @@ const alumnoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-//    comision: {
-//        type: mongoose.Schema.Types.ObjectId,
-//        ref: 'Comision', // referencia al modelo Comision
-//        required: true
-//    }
     comision: {
         type: String,
         required: true

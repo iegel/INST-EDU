@@ -52,7 +52,7 @@ export const updateMateria = async (req,res) =>{
 
 export const deleteMateria = async (req,res) =>{
     try{
-        const materia = await Mmteria.findByIdAndDelete(req.params.id) //El new true es para que abajo me devuelva el dato nuevo
+        const materia = await Materia.findByIdAndDelete(req.params.id) //El new true es para que abajo me devuelva el dato nuevo
         if (!materia) return res.status(404).json({message : "Materia no encontrada"})
         return res.sendStatus(204)
     }catch(error){
