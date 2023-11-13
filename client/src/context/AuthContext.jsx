@@ -17,14 +17,15 @@ export const AuthProvider = ({children}) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [errors,setErrors] = useState([])
     const [loading,setLoading] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const signup = async (user) =>
     {
         try{
             const res = await registerRequest(user)
             console.log(res.data)//datos del usuario
-            setUser(res.data);
-            setIsAuthenticated(true);
+//            setUser(res.data);
+//            setIsAuthenticated(true);
         }catch(error){
             setErrors(error.response.data);
         }
@@ -37,6 +38,9 @@ export const AuthProvider = ({children}) => {
             console.log(res)
             setUser(res.data);
             setIsAuthenticated(true);
+            if (res.data.role === "Admin"){
+                setIsAdmin(true);
+            }
         }catch(error){
             if (Array.isArray(error.response.data)){
                 return setErrors(error.response.data)
@@ -49,6 +53,7 @@ export const AuthProvider = ({children}) => {
         Cookies.remove("token")
         setIsAuthenticated(false)
         setUser(null)
+        setIsAdmin(false)
     }
 
     useEffect(()=> {
@@ -66,6 +71,7 @@ export const AuthProvider = ({children}) => {
 
             if (!cookies.token){
                 setIsAuthenticated(false);
+                setIsAdmin(false)
                 setLoading(false);
                 return setUser(null);
             }
@@ -75,18 +81,23 @@ export const AuthProvider = ({children}) => {
                 console.log(res)
                 if (!res.data){
                     setIsAuthenticated(false)
-                    setLoading(false);        
+                    setLoading(false);   
+                    setIsAdmin(false)     
                     return;            
                 } 
 
                 setIsAuthenticated(true)
                 setUser(res.data)
+                if (res.data.role === "Admin"){
+                    setIsAdmin(true);
+                }
                 setLoading(false);  
             }catch(error){
                 console.log(error)
                 setIsAuthenticated(false)
                 setUser(null)
                 setLoading(false); 
+                setIsAdmin(false)
             }
 
         }
@@ -95,7 +106,7 @@ export const AuthProvider = ({children}) => {
 
     return (
         <AuthContext.Provider value={{
-            signup,signin,loading,user,isAuthenticated,errors,logout
+            signup,signin,loading,user,isAuthenticated,errors,logout,isAdmin
         }}>
             {children}
         </AuthContext.Provider>

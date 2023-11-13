@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Input, Button, Form } from 'antd';
+import { Input, Button, Form, Select } from 'antd';
+
+const { Option } = Select;
 
 const UsuariosFormPage = () => {
   const { register } = useForm();
-  const { signup, isAuthenticated, errors: registerErrors } = useAuth();
+  const { signup, errors: registerErrors } = useAuth();
   const navigate = useNavigate();
   const params = useParams();
   const [form] = Form.useForm();
-
+  const [defaultRole, setDefaultRole] = useState('Preceptor');
 
   const onFinish = (values) => {
     console.log(values);
@@ -41,6 +43,7 @@ const UsuariosFormPage = () => {
           }}
           initialValues={{
             remember: true,
+            role: defaultRole, // Establecer el valor predeterminado del rol
           }}
           form={form}
           onFinish={onFinish}
@@ -54,8 +57,18 @@ const UsuariosFormPage = () => {
             <Input {...register('email')} placeholder="Email" />
           </Form.Item>
 
-          <Form.Item label="Contraseña" name="password" rules={[{ required: true, message: 'Contraseña obligatorio' }]}>
+          <Form.Item label="Contraseña" name="password" rules={[{ required: true, message: 'Contraseña obligatoria' }]}>
             <Input.Password {...register('password')} placeholder="Contraseña" />
+          </Form.Item>
+
+          <Form.Item label="Rol" name="role" rules={[{ required: true, message: 'Rol obligatorio' }]}>
+            <Select
+              {...register('role')}
+              placeholder="Selecciona un rol"
+            >
+              <Option value="Admin">Admin</Option>
+              <Option value="Preceptor">Preceptor</Option>
+            </Select>
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

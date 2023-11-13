@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js'
 
 export const register = async (req, res) => {
-    const { email, password, username } = req.body; // me guardo en las constantes lo que recibi en el json
+    const { email, password, username,role } = req.body; // me guardo en las constantes lo que recibi en el json
     //    console.log(email,password, username) //para ver que datos me llega desde el cliente (En formato json)
 
     try {
@@ -16,12 +16,13 @@ export const register = async (req, res) => {
             username,
             email,
             password : passworHash,
+            role
         }); // Creacion del usuario utilizando el modelo user
     
         const userSaved = await newUser.save(); // Guardar en la base de datos MongoDB
-        const token = await createAccesToken({id: userSaved._id}) // Esto me va a guardar un token
+        // const token = await createAccesToken({id: userSaved._id}) // Esto me va a guardar un token
 
-        res.cookie('token',token) //establecer cookie
+        // res.cookie('token',token) //establecer cookie
         // res.json({
         //     message: "User created successfully",
         // })
@@ -29,6 +30,7 @@ export const register = async (req, res) => {
             id:userSaved._id,
             username:userSaved.username,
             email:userSaved.email,
+            role:userSaved.role,
             createdAt:userSaved.createdAt,
             updatedAt:userSaved.updatedAt
         });    
@@ -70,6 +72,7 @@ export const login = async (req, res) => {
             id:userFound._id,
             username:userFound.username,
             email:userFound.email,
+            role:userFound.role,
             createdAt:userFound.createdAt,
             updatedAt:userFound.updatedAt
         });    
@@ -94,6 +97,7 @@ export const profile = async (req,res) => {
         id : userFound._id,
         username : userFound.username,
         email : userFound.email,
+        role : userFound.role,
         createdAt : userFound.createdAt,
         updatedAt : userFound.updatedAt,
     });
@@ -110,7 +114,8 @@ export const verifyToken = async (req,res) =>{
     return res.json({
         id:userFound._id,
         username: userFound.username,
-        email:userFound.email
+        email:userFound.email,
+        role:userFound.role
 
     })
     })

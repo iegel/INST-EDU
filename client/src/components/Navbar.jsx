@@ -8,7 +8,7 @@ const { Header } = Layout;
 const { SubMenu } = Menu;
 
 function Navbar() {
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAuthenticated, logout, user, isAdmin } = useAuth();
 
   return (
     <Header style={{ background: '#1677FF', display: 'flex', justifyContent: 'space-between' }}>
@@ -43,14 +43,15 @@ function Navbar() {
               <Link to="/add-comision">Crear Comision</Link>
             </Menu.Item>
           </SubMenu>
-          <SubMenu key="usuarios" title="Usuarios">
+          {isAdmin ? (<SubMenu key="usuarios" title="Usuarios">
             <Menu.Item key="7">
               <Link to="/usuarios">Lista de Usuarios</Link>
             </Menu.Item>
             <Menu.Item key="8">
               <Link to="/add-usuario">Crear Usuario</Link>
             </Menu.Item>
-          </SubMenu>
+          </SubMenu>) : null}
+
           <Menu.Item key="10" onClick={logout}>
             Salir
           </Menu.Item>

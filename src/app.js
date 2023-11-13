@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import authRoutes from './routes/auth.routes.js';
 import cookieParser from 'cookie-parser'
 import alumnoRoutes from './routes/alumnos.routes.js'
-import maeteriaRoutes from './routes/materias.routes.js'
+import materiaRoutes from './routes/materias.routes.js'
 import comisionRoutes from './routes/comisiones.routes.js'
 import cors from 'cors'
 
@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 app.use("/api",authRoutes); //todas las rutas van a comenzar con /api
 app.use("/api",alumnoRoutes); //todas las rutas van a comenzar con /api
-app.use("/api",maeteriaRoutes); //todas las rutas van a comenzar con /api
+app.use("/api",materiaRoutes); //todas las rutas van a comenzar con /api
 app.use("/api",comisionRoutes); //todas las rutas van a comenzar con /api
 
 
