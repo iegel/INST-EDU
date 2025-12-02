@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background: #202020;
+    color: white;
+}
+
+/* Botón blanco con hover azul */
+.btn-white-outline {
+  color: white !important;
+  background: transparent !important;
+  border: 1px solid white !important;
+  transition: all 0.2s ease;
+}
+
+.btn-white-outline:hover {
+  background: #1677ff !important;
+  border-color: #1677ff !important;
+  color: white !important;
+}

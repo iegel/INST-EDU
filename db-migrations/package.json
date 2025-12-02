@@ -1,0 +1,10 @@
+{
+  "name": "inst-edu-migrations",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
+    "migrate-mongo": "^12.1.3"
+  }
+}
