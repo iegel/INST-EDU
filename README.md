@@ -19,6 +19,7 @@
 
 ### 4) Correr migraciones
 
+`db-migrations\npx migrate-mongo down`
 `db-migrations\npx migrate-mongo up`
 
 ### 4) Ejecutar backend
