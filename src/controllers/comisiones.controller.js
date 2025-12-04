@@ -1,8 +1,13 @@
 import Comision from "../models/comision.model.js";
 import User from "../models/user.model.js";
 
+import Alumno from "../models/alumno.model.js";
+import Materia from "../models/materia.model.js";
+import Calificacion from "../models/calificacion.model.js";
+
+
 // GET /api/comisiones
-// Devuelve la lista de todas las comisiones, incluyendo datos básicos del preceptor.
+// Devuelvo la lista de todas las comisiones, incluyendo datos básicos del preceptor.
 export const getComisiones = async (req, res) => {
   try {
     const comisiones = await Comision.find().populate(
@@ -19,7 +24,7 @@ export const getComisiones = async (req, res) => {
 };
 
 // GET /api/comisiones/:id
-// Devuelve una comisión puntual, también con la info del preceptor.
+// Devuelvo una comisión puntual, también con la info del preceptor.
 export const getComision = async (req, res) => {
   try {
     const { id } = req.params;
@@ -75,15 +80,20 @@ export const createComision = async (req, res) => {
 };
 
 // PUT /api/comisiones/:id
-// Actualiza los datos de una comisión y opcionalmente cambia el preceptor asignado.
 export const updateComision = async (req, res) => {
   try {
     const { id } = req.params;
     const { numeroComision, anio, curso, preceptor } = req.body;
 
+    // Traigo la comisión actual para comparar antes de actualizar
+    const comisionActual = await Comision.findById(id);
+    if (!comisionActual) {
+      return res.status(404).json({ message: "Curso no encontrado" });
+    }
+
     const updateData = { numeroComision, anio, curso };
 
-    // Si viene un preceptor nuevo, validamos que exista
+    // Si me mandan un preceptor nuevo, valido que exista
     if (preceptor) {
       const preceptorUser = await User.findById(preceptor);
       if (!preceptorUser) {
@@ -92,13 +102,33 @@ export const updateComision = async (req, res) => {
       updateData.preceptor = preceptorUser._id;
     }
 
-    const updated = await Comision.findByIdAndUpdate(id, updateData, {
-      new: true, // devuelve el documento ya actualizado
-    }).populate("preceptor", "username email");
+    // Si el número de comisión cambia, tengo que validar que no esté en uso
+    const numeroCambió =
+      numeroComision && numeroComision !== comisionActual.numeroComision;
 
-    if (!updated) {
-      return res.status(404).json({ message: "Curso no encontrado" });
+    if (numeroCambió) {
+      const numeroViejo = comisionActual.numeroComision;
+
+      // Reviso si hay datos usando la comisión actual
+      const tieneAlumnos = await Alumno.exists({ comision: numeroViejo });
+      const tieneMaterias = await Materia.exists({ comision: numeroViejo });
+      const tieneCalificaciones = await Calificacion.exists({
+        comision: numeroViejo,
+      });
+
+      if (tieneAlumnos || tieneMaterias || tieneCalificaciones) {
+        // Si la comisión ya está en uso, no permito cambiar el número (1A, 2B, etc.)
+        return res.status(400).json({
+          message:
+            "No se puede cambiar el curso porque ya tiene alumnos, materias o boletines asociados. Primero hay que reasignar esos datos.",
+        });
+      }
     }
+
+    // Si pasó las validaciones, actualizo
+    const updated = await Comision.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).populate("preceptor", "username email");
 
     return res.json(updated);
   } catch (error) {
@@ -109,15 +139,39 @@ export const updateComision = async (req, res) => {
   }
 };
 
+
+
 // DELETE /api/comisiones/:id
-// Elimina una comisión por id.
 export const deleteComision = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Comision.findByIdAndDelete(id);
-    if (!deleted) {
+
+    // Primero busco la comisión por ID
+    const comision = await Comision.findById(id);
+    if (!comision) {
       return res.status(404).json({ message: "Curso no encontrado" });
     }
+
+    // Guardo el número de comisión (ej: "1A")
+    const numero = comision.numeroComision;
+
+    // Verifico si hay alumnos, materias o calificaciones que apunten a esta comisión
+    const tieneAlumnos = await Alumno.exists({ comision: numero });
+    const tieneMaterias = await Materia.exists({ comision: numero });
+    const tieneCalificaciones = await Calificacion.exists({ comision: numero });
+
+    if (tieneAlumnos || tieneMaterias || tieneCalificaciones) {
+      // Regla de negocio:
+      // si la comisión ya tiene info asociada, no la dejo borrar
+      return res.status(400).json({
+        message:
+          "No se puede borrar el curso porque tiene alumnos, materias o boletines asociados.",
+      });
+    }
+
+    // Si no tiene nada asociado, la borro normalmente
+    await Comision.findByIdAndDelete(id);
+
     return res.json({ message: "Curso eliminado correctamente" });
   } catch (error) {
     console.error("Error al eliminar curso:", error);

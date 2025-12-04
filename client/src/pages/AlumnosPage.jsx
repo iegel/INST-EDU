@@ -21,10 +21,9 @@ function AlumnosPage() {
   const [promoting, setPromoting] = useState(false); // loading del botón
   const navigate = useNavigate();
 
-  // Al montar el componente, pido la lista de alumnos al backend
+  // Al inciar el componente, pido la lista de alumnos al backend
   useEffect(() => {
     getAlumnos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Actualiza el estado de filtros cuando el usuario escribe en los inputs

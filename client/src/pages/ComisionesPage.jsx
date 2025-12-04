@@ -14,10 +14,9 @@ function ComisionesPage() {
     preceptor: "",
   });
 
-  // Al montar el componente, traigo la lista de cursos/comisiones
+  // Al iniciar el componente, traigo la lista de cursos/comisiones
   useEffect(() => {
     getComisiones();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Actualiza el filtro cuando el usuario escribe en los inputs

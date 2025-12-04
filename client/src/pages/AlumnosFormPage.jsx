@@ -17,10 +17,9 @@ function AlumnosFormPage() {
   // Si viene un :id en la URL, sé que estoy editando
   const isEdit = Boolean(params.id);
 
-  // Al montar, cargo las comisiones para popular el combo de cursos
+  // Al iniciar el componente, cargo las comisiones para completar el selector de cursos
   useEffect(() => {
     getComisiones();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Si estoy en modo edición, traigo los datos del alumno y los meto en el form

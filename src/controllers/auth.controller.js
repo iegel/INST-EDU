@@ -11,22 +11,22 @@ export const register = async (req, res) => {
     const { username, email, password, role, isActive } = req.body;
     // En este punto el body ya pasó por el esquema de Zod (validaciones básicas)
 
-    // Hasheamos la contraseña antes de guardarla
+    // Hasheo la contraseña antes de guardarla
     const passwordHash = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       username,
       email,
       password: passwordHash,
-      // Si no viene rol, por defecto lo dejamos como "Preceptor"
+      // Si no viene rol, por defecto lo dejo como "Preceptor"
       role: role || "Preceptor",
-      // Si no mandan isActive, asumimos que el usuario está activo
+      // Si no mandan isActive, asumo que el usuario está activo
       isActive: typeof isActive === "boolean" ? isActive : true,
     });
 
     await newUser.save();
 
-    // No devolvemos la contraseña al frontend
+    // No devuelvo la contraseña al frontend
     return res.status(201).json({
       id: newUser._id,
       username: newUser.username,
@@ -37,7 +37,7 @@ export const register = async (req, res) => {
   } catch (error) {
     console.error("Error en register:", error);
 
-    // Error típico de Mongo si el email ya existe (índice único)
+    // Error si el email ya existe (índice único)
     if (error.code === 11000) {
       return res.status(400).json({ message: "El email ya está registrado" });
     }
@@ -54,7 +54,7 @@ export const login = async (req, res) => {
   // Acá ya vienen validados email y password desde el middleware de Zod
 
   try {
-    // Buscamos el usuario por email e incluimos el campo password (que suele estar oculto)
+    // Buscamos el usuario por email e incluyo el campo password
     const userFound = await User.findOne({ email }, "+password");
     if (!userFound)
       return res.status(400).json({ message: "Usuario no encontrado" });
@@ -73,13 +73,13 @@ export const login = async (req, res) => {
       return res.status(401).end();
     }
 
-    // Si la contraseña es correcta, generamos un token JWT
+    // Si la contraseña es correcta, geno un token JWT
     const token = await createAccesToken({ id: userFound._id });
 
-    // Guardamos el token en una cookie para que el frontend pueda enviarlo en cada request
+    // Guardo el token en una cookie para que el frontend pueda enviarlo en cada request
     res.cookie("token", token);
 
-    // Respondemos con los datos básicos del usuario logueado
+    // Respondo con los datos básicos del usuario logueado
     res.json({
       id: userFound._id,
       username: userFound.username,
@@ -93,7 +93,7 @@ export const login = async (req, res) => {
   }
 };
 
-// Cierra sesión limpiando la cookie del token
+// Cierro sesión limpiando la cookie del token
 export const logout = (req, res) => {
   res.cookie("token", "", {
     expires: new Date(0),
@@ -101,7 +101,7 @@ export const logout = (req, res) => {
   return res.sendStatus(200);
 };
 
-// Devuelve la información del usuario autenticado
+// Devuelvo la información del usuario autenticado
 export const profile = async (req, res) => {
   const userFound = await User.findById(req.user.id);
 
@@ -118,13 +118,13 @@ export const profile = async (req, res) => {
   });
 };
 
-// Verifica si el token actual es válido y devuelve los datos del usuario
+// Verifico si el token actual es válido y devuelvo los datos del usuario
 export const verifyToken = async (req, res) => {
   const { token } = req.cookies;
 
   if (!token) return res.status(401).json({ message: "Unauthorized" });
 
-  // Verificamos el token con la clave secreta
+  // Verifico el token con la clave secreta
   jwt.verify(token, TOKEN_SECRET, async (err, user) => {
     if (err) return res.status(401).json({ message: "Unauthorized" });
 
@@ -140,10 +140,10 @@ export const verifyToken = async (req, res) => {
   });
 };
 
-// Listar todos los usuarios (solo Admin)
+// Listo todos los usuarios (solo Admin)
 export const getUsers = async (req, res) => {
   try {
-    // Usuario que hace la petición (lo obtenemos desde el token)
+    // Usuario que hace la petición (lo obtengo desde el token)
     const currentUser = await User.findById(req.user.id);
 
     if (!currentUser || currentUser.role !== "Admin") {
@@ -152,7 +152,7 @@ export const getUsers = async (req, res) => {
         .json({ message: "Acceso denegado. Solo Admin puede ver usuarios." });
     }
 
-    // Listamos todos los usuarios ocultando el campo password
+    // Listo todos los usuarios ocultando el campo password
     const users = await User.find({}, "-password");
 
     res.json(users);
@@ -162,7 +162,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
-// Obtener un usuario por id (solo Admin)
+// Obtengo un usuario por id (solo Admin)
 export const getUserById = async (req, res) => {
   try {
     const currentUser = await User.findById(req.user.id);
@@ -183,7 +183,7 @@ export const getUserById = async (req, res) => {
   }
 };
 
-// Actualizar usuario (solo Admin)
+// Actualizo usuario (solo Admin)
 export const updateUser = async (req, res) => {
   try {
     const currentUser = await User.findById(req.user.id);
@@ -202,13 +202,13 @@ export const updateUser = async (req, res) => {
       isActive,
     };
 
-    // Si viene una contraseña nueva, la guardamos hasheada
+    // Si viene una contraseña nueva, la guardo hasheada
     if (password && password.trim() !== "") {
       updateData.password = await bcrypt.hash(password, 10);
     }
 
     const updated = await User.findByIdAndUpdate(req.params.id, updateData, {
-      new: true, // devuelve el usuario ya actualizado
+      new: true, // devuelvo el usuario ya actualizado
       runValidators: true,
       select: "-password",
     });
@@ -241,14 +241,14 @@ export const deleteUser = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Opcional: evitar que el admin se borre a sí mismo
+    // Evito que el admin se borre a sí mismo
     if (currentUser._id.toString() === userToDelete._id.toString()) {
       return res
         .status(400)
         .json({ message: "No podés borrar tu propio usuario." });
     }
 
-    // Si es PRECEPTOR, verificamos si tiene cursos/comisiones asignadas
+    // Si es PRECEPTOR, verificos si tiene cursos/comisiones asignadas
     const esPreceptor = userToDelete.role === "Preceptor";
     if (esPreceptor) {
       const tieneCursos = await Comision.findOne({

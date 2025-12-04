@@ -1,7 +1,6 @@
 import axios from "./axios";
 
 // Obtiene boletín del alumno
-// Si viene cicloKey "2023|1A" → se consulta ese boletín puntual
 export const getBoletinByAlumnoRequest = (alumnoId, cicloKey) => {
   if (cicloKey) {
     const [year, comision] = cicloKey.split("|")

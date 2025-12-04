@@ -8,7 +8,7 @@ import {
 
 const { Option } = Select;
 
-// Helper para calcular promedio, habilitación de diciembre/marzo/previa
+// Funcion para calcular promedio, habilitación de diciembre/marzo/previa
 // y la nota final de una fila (una materia).
 function calcularEstadoFila(notas) {
   const t1 = typeof notas[1] === "number" ? notas[1] : null;

@@ -6,8 +6,8 @@ import User from "../models/user.model.js";
 import Comision from "../models/comision.model.js";
 
 // GET /api/boletin/:alumnoId?year=2025&comision=1A
-// Devuelve el boletín de un alumno para un ciclo lectivo y comisión.
-// Si no se pasan parámetros, devuelve el "boletín actual" de su comisión actual.
+// Devuelvo el boletín de un alumno para un ciclo lectivo y comisión.
+// Si no se pasan parámetros, devuelvo el "boletín actual" de su comisión actual.
 export const getBoletinAlumno = async (req, res) => {
   try {
     const { alumnoId } = req.params;
@@ -27,7 +27,7 @@ export const getBoletinAlumno = async (req, res) => {
       return res.status(404).json({ message: "Alumno no encontrado" });
     }
 
-    // 🔐 Si es Preceptor, validamos que el alumno sea de alguna de sus comisiones
+    // Si es Preceptor, valido que el alumno sea de alguna de sus comisiones
     if (user.role === "Preceptor") {
       const comisionesPreceptor = await Comision.find({
         preceptor: user._id,
@@ -97,14 +97,14 @@ export const getBoletinAlumno = async (req, res) => {
       }
     }
 
-    // Traemos las materias de la comisión seleccionada
+    // Traigo las materias de la comisión seleccionada
     const materias = await Materia.find({
       comision: comisionSeleccionada,
     });
 
     let calificaciones = [];
     if (cicloSeleccionado !== null) {
-      // Traemos las calificaciones del alumno para ese ciclo+comisión
+      // Traigo las calificaciones del alumno para ese ciclo+comisión
       calificaciones = await Calificacion.find({
         alumno: alumnoId,
         cicloLectivo: cicloSeleccionado,
@@ -129,8 +129,8 @@ export const getBoletinAlumno = async (req, res) => {
 };
 
 // POST /api/boletin/:alumnoId
-// Guarda el boletín completo de un ciclo lectivo para un alumno.
-// Primero borra las notas previas de ese año y luego inserta todas las nuevas.
+// Guardo el boletín completo de un ciclo lectivo para un alumno.
+// Primero borro las notas previas de ese año y luego inserto todas las nuevas.
 export const guardarBoletinAlumno = async (req, res) => {
   try {
     const { alumnoId } = req.params;
@@ -160,7 +160,7 @@ export const guardarBoletinAlumno = async (req, res) => {
       return res.status(404).json({ message: "Alumno no encontrado" });
     }
 
-    // 🔐 Si es Preceptor → solo puede modificar boletines de sus alumnos
+    // Si es Preceptor → solo puede modificar boletines de sus alumnos
     if (user.role === "Preceptor") {
       const comisionesPreceptor = await Comision.find({
         preceptor: user._id,
@@ -175,7 +175,7 @@ export const guardarBoletinAlumno = async (req, res) => {
       }
     }
 
-    // 🚫 Restricción: un alumno egresado no puede recibir nuevos boletines
+    //  Restricción: un alumno egresado no puede recibir nuevos boletines
     if (alumno.egresado) {
       return res.status(400).json({
         message:
@@ -186,14 +186,14 @@ export const guardarBoletinAlumno = async (req, res) => {
     // Comisión a usar para el boletín: la que viene en el body o la comisión actual del alumno
     const comisionBoletin = comisionBody || alumno.comision;
 
-    // Primero borramos las calificaciones previas de ese ciclo+comisión
+    // Primero borro las calificaciones previas de ese ciclo+comisión
     await Calificacion.deleteMany({
       alumno: alumnoId,
       cicloLectivo,
       comision: comisionBoletin,
     });
 
-    // Preparamos los documentos a insertar
+    // Preparo los documentos a insertar
     const docs = calificaciones.map((c) => ({
       alumno: alumnoId,
       materia: c.materiaId,
@@ -219,7 +219,7 @@ export const guardarBoletinAlumno = async (req, res) => {
 };
 
 // GET /api/boletin/:alumnoId/historial
-// Devuelve todas las calificaciones del alumno agrupadas por ciclo lectivo y comisión.
+// Devuelvo todas las calificaciones del alumno agrupadas por ciclo lectivo y comisión.
 export const getHistorialBoletinAlumno = async (req, res) => {
   try {
     const { alumnoId } = req.params;
@@ -229,7 +229,7 @@ export const getHistorialBoletinAlumno = async (req, res) => {
       return res.status(404).json({ message: "Alumno no encontrado" });
     }
 
-    // Traemos todas las calificaciones del alumno, ordenadas por año y trimestre
+    // Traigo todas las calificaciones del alumno, ordenadas por año y trimestre
     const calificaciones = await Calificacion.find({
       alumno: alumnoId,
     })
@@ -238,7 +238,7 @@ export const getHistorialBoletinAlumno = async (req, res) => {
 
     const historial = [];
 
-    // Agrupamos por cicloLectivo + comision
+    // Agrupo por cicloLectivo + comision
     for (const cal of calificaciones) {
       const ciclo = cal.cicloLectivo || "Sin ciclo";
       const comision = cal.comision || "Sin comisión";

@@ -55,7 +55,7 @@ function ComisionesFormPage() {
   }, [isEdit, params.id, getComision, form]);
 
   const onFinish = async (values) => {
-    // Armo el payload como lo espera el backend
+    // Armo la lista de datos como lo espera el backend
     const payload = {
       // numeroComision tipo "3A", "5B", etc.
       numeroComision: `${values.anio}${values.curso.toUpperCase()}`,

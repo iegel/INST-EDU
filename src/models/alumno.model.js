@@ -1,31 +1,25 @@
-// models/alumno.model.js
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const alumnoSchema = new mongoose.Schema(
   {
     // Nombre del alumno
-    nombre: { type: String, required: true },
+    nombre: { type: String, required: true, trim: true },
 
     // Apellido del alumno
-    apellido: { type: String, required: true },
+    apellido: { type: String, required: true, trim: true },
 
-    // DNI como string para evitar problemas de formato
-    dni: { type: String, required: true },
+    // DNI ÚNICO 
+    dni: { type: String, required: true, unique: true, trim: true },
 
-    // Comisión a la que pertenece (ej: "1A", "3B")
-    comision: { type: String, required: true },
+    // Comisión actual
+    comision: { type: String, required: true, trim: true },
 
-    // Indica si el alumno ya egresó
-    egresado: {
-      type: Boolean,
-      default: false,
-    },
+    // Si el alumno terminó 5° año → pasa a egresado
+    egresado: { type: Boolean, default: false },
   },
   {
-    // Guarda automáticamente createdAt y updatedAt
-    timestamps: true,
+    timestamps: true, // agrega createdAt y updatedAt
   }
 );
 
-
-export default mongoose.model('Alumno', alumnoSchema);
+export default mongoose.model("Alumno", alumnoSchema);

@@ -5,38 +5,35 @@ import bcrypt from 'bcryptjs';
 const validRoles = ["Admin", "Preceptor"];
 
 // Esquema de Usuario para autenticación y permisos
-const userSchema = new mongoose.Schema(
-  {
+const userSchema = new mongoose.Schema({
     username: {
-      type: String,
-      required: true,
-      trim: true,
+        type: String,
+        required: true,
+        trim: true,
+        unique: true // cada usuario es único
     },
     email: {
-      type: String,
-      required: true,
-      trim: true,
-      unique: true, // un mismo mail no se puede repetir
+        type: String,
+        required: true,
+        trim: true,
+        unique: true // cada email es único
     },
     password: {
-      type: String,
-      required: true,
-      select: false, // por defecto no trae el password en las consultas
+        type: String,
+        required: true,
+        select: false
     },
     role: {
-      type: String,
-      required: true,
-      enum: validRoles, // solo Admin o Preceptor
+        type: String,
+        required: true,
+        enum: validRoles
     },
     isActive: {
-      type: Boolean,
-      default: true,
+        type: Boolean,
+        default: true
     },
-  },
-  {
-    timestamps: true,
-  }
-);
+}, { timestamps: true });
+
 
 // Método de instancia para verificar contraseña y estado del usuario
 userSchema.method(
@@ -46,7 +43,7 @@ userSchema.method(
       return Promise.reject(new Error("Password is required"));
     }
 
-    // Comparamos la contraseña en texto plano con el hash guardado
+    // Comparo la contraseña en texto plano con el hash guardado
     const isMatch = await bcrypt.compare(potentialPassword, this.password);
 
     // isOk indica si la contraseña coincide

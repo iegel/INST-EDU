@@ -14,7 +14,7 @@ function MateriasPage() {
     comision: "",
   });
 
-  // Al montar el componente, traigo la lista de materias
+  // Al iniciar el componente, traigo la lista de materias
   useEffect(() => {
     getMaterias();
     // eslint-disable-next-line react-hooks/exhaustive-deps

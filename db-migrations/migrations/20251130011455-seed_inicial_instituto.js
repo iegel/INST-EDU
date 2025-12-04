@@ -23,7 +23,7 @@ module.exports = {
 
     console.log("Colecciones limpiadas");
 
-    // 2) Creo el usuario admin con un nombre real (yo 😎)
+    // 2) Creo el usuario admin
     const adminPassword = await bcrypt.hash("123456", 10);
     await usersCol.insertOne({
       username: "ignacio.egel",
@@ -35,7 +35,7 @@ module.exports = {
     });
     console.log("Admin creado (Ignacio Egel)");
 
-    // 3) Defino los preceptores, uno por cada año, con nombres argentinos
+    // 3) Defino los preceptores, uno por cada año
     const preceptoresData = [
       { anio: 1, username: "carlos.gomez", email: "carlos.gomez@instedu.com.ar" },
       { anio: 2, username: "mariana.lopez", email: "mariana.lopez@instedu.com.ar" },
@@ -85,7 +85,7 @@ module.exports = {
       }
     }
 
-    // 5) Creo 4 alumnos por cada curso, con nombres y apellidos “normales” de acá
+    // 5) Creo 4 alumnos por cada curso
     const nombres = [
       "Lucas", "Camila", "Santiago", "Agustina",
       "Matías", "Valentina", "Julián", "Martina",
@@ -98,7 +98,7 @@ module.exports = {
       "Díaz", "Herrera", "Álvarez", "Torres",
     ];
 
-    // Uso un dniBase para generar DNIs diferentes pero claramente de prueba
+    // Uso un dniBase para generar DNIs diferentes
     let dniBase = 45000000;
 
     const alumnosToInsert = [];
@@ -114,7 +114,7 @@ module.exports = {
           nombre,
           apellido,
           dni: String(dniBase),
-          comision: curso.numeroComision, // en mi modelo la comision es un string como "1A"
+          comision: curso.numeroComision,
           seed: true,
         });
 
@@ -150,7 +150,7 @@ module.exports = {
       "5B": ["Psicología", "Arte Contemporáneo", "Comunicación", "Proyecto Integrador"],
     };
 
-    // Lista de docentes con nombre y apellido típicos de Argentina
+    // Lista de docentes con nombre y apellido
     const docentes = [
       "Andrea Castro",
       "Pablo Medina",
@@ -188,7 +188,7 @@ module.exports = {
 
         materiasToInsert.push({
           nombreMateria,
-          docente: docenteNombre, // 👈 ahora es nombre y apellido real
+          docente: docenteNombre, 
           comision: codigo,
           seed: true,
         });
@@ -197,7 +197,7 @@ module.exports = {
 
     await materiasCol.insertMany(materiasToInsert);
     console.log(
-      `${materiasToInsert.length} materias creadas (10 por curso aprox., con variaciones por comisión y docentes reales)`
+      `${materiasToInsert.length} materias creadas`
     );
 
     console.log("Migración de datos iniciales completada con éxito");

@@ -7,7 +7,6 @@ module.exports = {
   mongodb: {
     url: process.env.MONGO_URI,
     databaseName: process.env.MONGO_DB_NAME,
-    // 🔴 SAQUÉ options porque el driver nuevo no lo necesita
   },
 
   migrationsDir: "migrations",

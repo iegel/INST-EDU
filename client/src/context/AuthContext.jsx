@@ -16,16 +16,16 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   // Datos del usuario logueado
   const [user, setUser] = useState(null);
-  // Bandera de si hay sesión activa
+  // Flag de si hay sesión activa
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   // Errores para mostrar en el login/registro
   const [errors, setErrors] = useState([]);
   // Para saber si todavía estoy chequeando el token
   const [loading, setLoading] = useState(true);
-  // Bandera de si el usuario actual es Admin
+  // Flag de si el usuario actual es Admin
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Registro de usuario nuevo (no lo usás tanto en el front, pero queda)
+  // Registro de usuario nuevo
   const signup = async (user) => {
     try {
       const res = await registerRequest(user);
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [errors]);
 
-  // Al montar la app, chequeo si ya hay un token válido (mantener sesión)
+// Al iniciar la aplicación, verifico si ya existe un token válido
   useEffect(() => {
     async function checkLogin() {
       const cookies = Cookies.get();

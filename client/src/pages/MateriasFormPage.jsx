@@ -16,7 +16,7 @@ const MateriasFormPage = () => {
   // Si viene id en la URL, estoy editando
   const isEdit = Boolean(params.id);
 
-  // Al montar, traigo la lista de comisiones para llenar el combo
+  // Al iniciar el componente, cargo las comisiones para completar el selector de cursos
   useEffect(() => {
     getComisiones();
   }, [getComisiones]);
