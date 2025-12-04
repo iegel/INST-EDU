@@ -1,4 +1,14 @@
-# INST-EDU
+# INST-EDU – Sistema de Gestión Institucional (MERN)
+
+Proyecto final de Programación 3.  
+Este sistema permite administrar:
+
+- Usuarios del sistema (Admin y Preceptores)
+- Comisiones / cursos (1A, 2B…)
+- Alumnos
+- Materias por curso
+- Boletines por alumno (notas por trimestre, diciembre, marzo y previa)
+- Pasar de año a los alumnos
 
 ## Configurar backend
 
