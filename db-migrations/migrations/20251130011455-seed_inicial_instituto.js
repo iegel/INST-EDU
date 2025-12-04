@@ -125,7 +125,7 @@ module.exports = {
     }
 
     await alumnosCol.insertMany(alumnosToInsert);
-    console.log(`${alumnosToInsert.length} alumnos creados (4 por curso, nombres reales)`);
+    console.log(`${alumnosToInsert.length} alumnos creados (4 por curso)`);
 
     // 6) Materias por curso: base + variaciones según comisión
     const materiasBase = [
