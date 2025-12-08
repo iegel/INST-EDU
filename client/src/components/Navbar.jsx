@@ -31,59 +31,72 @@ function Navbar() {
         </Link>
       </div>
 
-      {isAuthenticated ? (
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          style={{ lineHeight: '64px' }}
-        >
-          {/* 👇 Esto lo ven TODOS los logueados (Admin y Preceptor) */}
+      {isAuthenticated && (
+        <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
+
+          {/* ----------------------------
+              ALUMNOS 
+          ----------------------------- */}
           <SubMenu key="alumnos" title="Alumnos">
-            <Menu.Item key="1">
+            <Menu.Item key="alumnos-list">
               <Link to="/alumnos">Lista de Alumnos</Link>
             </Menu.Item>
-            <Menu.Item key="2">
-              <Link to="/add-alumno">Crear Alumno</Link>
-            </Menu.Item>
+
+            {isAdmin && (
+              <Menu.Item key="alumnos-add">
+                <Link to="/add-alumno">Crear Alumno</Link>
+              </Menu.Item>
+            )}
           </SubMenu>
 
-          {/* 👇 Estas SOLO las ve el ADMIN */}
+          {/* ----------------------------
+              MATERIAS 
+          ----------------------------- */}
+          <SubMenu key="materias" title="Materias">
+            <Menu.Item key="materias-list">
+              <Link to="/materias">Lista de Materias</Link>
+            </Menu.Item>
+
+            {isAdmin && (
+              <Menu.Item key="materias-add">
+                <Link to="/add-materia">Crear Materia</Link>
+              </Menu.Item>
+            )}
+          </SubMenu>
+
+          {/* ----------------------------
+              SOLO ADMIN:
+          ----------------------------- */}
           {isAdmin && (
             <>
-              <SubMenu key="materias" title="Materias">
-                <Menu.Item key="3">
-                  <Link to="/materias">Lista de Materias</Link>
-                </Menu.Item>
-                <Menu.Item key="4">
-                  <Link to="/add-materia">Crear Materia</Link>
-                </Menu.Item>
-              </SubMenu>
-
               <SubMenu key="comisiones" title="Cursos">
-                <Menu.Item key="5">
+                <Menu.Item key="comisiones-list">
                   <Link to="/comisiones">Lista de Cursos</Link>
                 </Menu.Item>
-                <Menu.Item key="6">
+
+                <Menu.Item key="comisiones-add">
                   <Link to="/add-comision">Crear Curso</Link>
                 </Menu.Item>
               </SubMenu>
 
               <SubMenu key="usuarios" title="Usuarios">
-                <Menu.Item key="7">
+                <Menu.Item key="usuarios-list">
                   <Link to="/usuarios">Lista de Usuarios</Link>
                 </Menu.Item>
-                <Menu.Item key="8">
+
+                <Menu.Item key="usuarios-add">
                   <Link to="/add-usuario">Crear Usuario</Link>
                 </Menu.Item>
               </SubMenu>
             </>
           )}
 
-          <Menu.Item key="10" onClick={logout}>
+
+          <Menu.Item key="logout" onClick={logout}>
             Salir
           </Menu.Item>
         </Menu>
-      ) : null}
+      )}
     </Header>
   );
 }

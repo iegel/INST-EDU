@@ -29,6 +29,8 @@ function App() {
 
         {/* Rutas protegidas para cualquier usuario logueado (Admin o Preceptor) */}
         <Route element={<ProtectedRoute />}>
+
+          {/* ABM Alumnos */}
           <Route path="/alumnos" element={<AlumnosPage />} />
           <Route path="/add-alumno" element={<AlumnosFormPage />} />
           <Route path="/alumnos/:id" element={<AlumnosFormPage />} />
@@ -43,6 +45,7 @@ function App() {
 
         {/* Rutas exclusivas para Admin */}
         <Route element={<ProtectedRouteAdmin />}>
+
           {/* ABM de usuarios */}
           <Route path="/usuarios" element={<UsuariosPage />} />
           <Route path="/usuarios/:id" element={<UsuariosFormPage />} />
