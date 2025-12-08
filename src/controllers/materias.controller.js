@@ -1,4 +1,5 @@
 import Materia from '../models/materia.model.js'
+import User from '../models/user.model.js'
 
 // Obtengo todas las materias guardadas en la base
 export const getMaterias = async (req, res) => {
@@ -15,6 +16,17 @@ export const getMaterias = async (req, res) => {
 // Creo una nueva materia
 export const createMateria = async (req, res) => {
     try {
+
+        // Usuario que hace la petición (viene del token)
+        const currentUser = await User.findById(req.user.id);
+
+        // Si no existe o no es Admin, no lo dejo continuar
+        if (!currentUser || currentUser.role !== "Admin") {
+        return res.status(403).json({
+            message: "Solo un administrador puede crear materias",
+        });
+        }
+
         // Desestructuro los datos que vienen del formulario del front
         const { nombreMateria, docente, comision } = req.body
 
@@ -57,6 +69,15 @@ export const getMateria = async (req, res) => {
 // Actualizo una materia por ID
 export const updateMateria = async (req, res) => {
     try {
+
+        // Valido que el usuario sea Admin
+        const currentUser = await User.findById(req.user.id);
+        if (!currentUser || currentUser.role !== "Admin") {
+        return res.status(403).json({
+            message: "Solo un administrador puede editar materias",
+        });
+        }
+        
         const materia = await Materia.findByIdAndUpdate(
             req.params.id,
             req.body,
@@ -79,6 +100,15 @@ export const updateMateria = async (req, res) => {
 // Elimino una materia por ID
 export const deleteMateria = async (req, res) => {
     try {
+
+        // Valido que el usuario sea Admin
+        const currentUser = await User.findById(req.user.id);
+        if (!currentUser || currentUser.role !== "Admin") {
+        return res.status(403).json({
+            message: "Solo un administrador puede borrar materias",
+        });
+        }
+
         const materia = await Materia.findByIdAndDelete(req.params.id)
 
         if (!materia) return res.status(404).json({ message: "Materia no encontrada" })

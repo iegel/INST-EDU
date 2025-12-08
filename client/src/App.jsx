@@ -35,6 +35,10 @@ function App() {
 
           {/* Boletín de un alumno */}
           <Route path="/boletin/:id" element={<BoletinPage />} />
+
+          {/* Lista de materias */}
+          <Route path="/materias" element={<MateriasPage />} />
+
         </Route>
 
         {/* Rutas exclusivas para Admin */}
@@ -50,7 +54,6 @@ function App() {
           <Route path="/comisiones/:id" element={<ComisionesFormPage />} />
 
           {/* ABM de materias */}
-          <Route path="/materias" element={<MateriasPage />} />
           <Route path="/add-materia" element={<MateriasFormPage />} />
           <Route path="/materias/:id" element={<MateriasFormPage />} />
         </Route>

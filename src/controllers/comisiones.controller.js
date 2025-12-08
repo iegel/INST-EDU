@@ -50,6 +50,15 @@ export const getComision = async (req, res) => {
 // Crea una comisión nueva y asocia un preceptor existente.
 export const createComision = async (req, res) => {
   try {
+
+    // Usuario autenticado
+    const currentUser = await User.findById(req.user.id);
+    if (!currentUser || currentUser.role !== "Admin") {
+      return res.status(403).json({
+        message: "Solo un administrador puede crear cursos",
+      });
+    }
+
     const { numeroComision, anio, curso, preceptor } = req.body;
 
     // Validamos que el preceptor exista en la colección de usuarios
@@ -82,6 +91,14 @@ export const createComision = async (req, res) => {
 // PUT /api/comisiones/:id
 export const updateComision = async (req, res) => {
   try {
+
+    const currentUser = await User.findById(req.user.id);
+    if (!currentUser || currentUser.role !== "Admin") {
+      return res.status(403).json({
+        message: "Solo un administrador puede editar cursos",
+      });
+    }
+
     const { id } = req.params;
     const { numeroComision, anio, curso, preceptor } = req.body;
 
@@ -144,6 +161,15 @@ export const updateComision = async (req, res) => {
 // DELETE /api/comisiones/:id
 export const deleteComision = async (req, res) => {
   try {
+
+
+    const currentUser = await User.findById(req.user.id);
+    if (!currentUser || currentUser.role !== "Admin") {
+      return res.status(403).json({
+        message: "Solo un administrador puede borrar cursos",
+      });
+    }
+
     const { id } = req.params;
 
     // Primero busco la comisión por ID
@@ -172,7 +198,7 @@ export const deleteComision = async (req, res) => {
     // Si no tiene nada asociado, la borro normalmente
     await Comision.findByIdAndDelete(id);
 
-    return res.json({ message: "Curso eliminado correctamente" });
+    return res.sendStatus(204);
   } catch (error) {
     console.error("Error al eliminar curso:", error);
     return res

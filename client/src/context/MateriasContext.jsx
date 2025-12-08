@@ -40,7 +40,7 @@ export default function MateriasProvider({ children }) {
     try {
       const res = await createMateriasRequest(materia);
       console.log(res);
-      // Podrías llamar a getMaterias() para refrescar la lista si querés
+      // LLama a getMaterias() para refrescar la lista si querés
     } catch (error) {
       console.log(error);
     }
@@ -51,7 +51,7 @@ export default function MateriasProvider({ children }) {
     try {
       const res = await updateMateriasRequest(id, materia);
       console.log(res);
-      // También se podría refrescar el listado si es necesario
+      // Refresca el listado si es necesario
     } catch (error) {
       console.log(error);
     }
