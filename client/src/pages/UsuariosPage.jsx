@@ -97,7 +97,8 @@ function UsuariosPage() {
   // Aplico filtros en memoria sobre la lista de usuarios
   const filteredUsuarios = useMemo(() => {
     if (!usuarios) return [];
-    return usuarios.filter((u) => {
+
+    const filtrados = usuarios.filter((u) => {
       const matchUsername = u.username
         ?.toLowerCase()
         .includes(filters.username.toLowerCase());
@@ -118,6 +119,18 @@ function UsuariosPage() {
       }
 
       return matchUsername && matchEmail && matchRole && matchEstado;
+    });
+
+    // Orden por defecto: username, email
+    return [...filtrados].sort((a, b) => {
+      const uA = (a.username || "").toLowerCase();
+      const uB = (b.username || "").toLowerCase();
+      const byUsername = uA.localeCompare(uB);
+      if (byUsername !== 0) return byUsername;
+
+      const eA = (a.email || "").toLowerCase();
+      const eB = (b.email || "").toLowerCase();
+      return eA.localeCompare(eB);
     });
   }, [usuarios, filters]);
 
