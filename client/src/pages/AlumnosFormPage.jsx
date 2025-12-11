@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, Input, Select, Button, message, Switch } from "antd";
 import { useAlumnos } from "../context/AlumnosContext";
@@ -22,7 +22,18 @@ function AlumnosFormPage() {
     getComisiones();
   }, []);
 
-  // Si estoy en modo edición, traigo los datos del alumno y los meto en el form
+  // Ordeno las comisiones por año y luego por letra de curso (1A,1B,2A...)
+  const comisionesOrdenadas = useMemo(() => {
+    if (!comisiones) return [];
+    return [...comisiones].sort((a, b) => {
+      if (a.anio !== b.anio) return a.anio - b.anio;
+      const cursoA = (a.curso || "").toString().toUpperCase();
+      const cursoB = (b.curso || "").toString().toUpperCase();
+      return cursoA.localeCompare(cursoB);
+    });
+  }, [comisiones]);
+
+  // Si estoy en edición, cargo el alumno
   useEffect(() => {
     async function loadAlumno() {
       if (!isEdit) return;
@@ -139,7 +150,7 @@ function AlumnosFormPage() {
             rules={[{ required: true, message: "Seleccioná un curso" }]}
           >
             <Select placeholder="Seleccioná un curso">
-              {comisiones.map((c) => (
+              {comisionesOrdenadas.map((c) => (
                 <Option key={c._id} value={c.numeroComision}>
                   {`${c.anio}° año - Curso ${c.curso}`}
                 </Option>

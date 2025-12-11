@@ -31,7 +31,7 @@ function ComisionesPage() {
   const filteredComisiones = useMemo(() => {
     if (!comisiones) return [];
 
-    return comisiones.filter((c) => {
+    const filtradas = comisiones.filter((c) => {
       const anioStr = c.anio?.toString() ?? "";
       const cursoStr = c.curso?.toString() ?? "";
       const preceptorStr = c.preceptor
@@ -51,6 +51,14 @@ function ComisionesPage() {
         .includes(filters.preceptor.toLowerCase());
 
       return matchAnio && matchCurso && matchPreceptor;
+    });
+
+    // Ordeno por año y luego letra de curso
+    return [...filtradas].sort((a, b) => {
+      if (a.anio !== b.anio) return a.anio - b.anio;
+      const cursoA = (a.curso || "").toString().toUpperCase();
+      const cursoB = (b.curso || "").toString().toUpperCase();
+      return cursoA.localeCompare(cursoB);
     });
   }, [comisiones, filters]);
 
@@ -88,10 +96,13 @@ function ComisionesPage() {
       render: (_, record) => (
         <span>{`${record.anio}° año - Curso ${record.curso}`}</span>
       ),
-      sorter: (a, b) =>
-        `${a.anio}° año - Curso ${a.curso}`
-          .toString()
-          .localeCompare(`${b.anio}° año - Curso ${b.curso}`.toString()),
+      // Orden por año y luego letra del curso
+      sorter: (a, b) => {
+        if (a.anio !== b.anio) return a.anio - b.anio;
+        const cursoA = (a.curso || "").toString().toUpperCase();
+        const cursoB = (b.curso || "").toString().toUpperCase();
+        return cursoA.localeCompare(cursoB);
+      },
       sortDirections: ["ascend", "descend"],
     },
     {

@@ -5,6 +5,21 @@ import { useAuth } from "../context/AuthContext";
 import { Popconfirm, Space, Table, Button, Input } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 
+// Ordena comisiones "1A", "1B", "2B"..
+const parseCurso = (value) => {
+  if (!value) return { anio: 999, letra: "" };
+
+  const str = value.toString().trim();
+  const match = str.match(/^(\d+)\s*([A-Za-z])$/);
+
+  if (!match) return { anio: 999, letra: str.toUpperCase() };
+
+  return {
+    anio: parseInt(match[1], 10),
+    letra: match[2].toUpperCase(),
+  };
+};
+
 function MateriasPage() {
   const { getMaterias, deleteMateria, materias } = useMaterias();
   const { comisiones, getComisiones } = useComisiones();
@@ -64,8 +79,8 @@ function MateriasPage() {
       }
     }
 
-    // Aplico los filtros de texto de la pantalla
-    return base.filter((m) => {
+    // 1) Aplico filtros de texto
+    const filtradas = base.filter((m) => {
       const matchNombre = m.nombreMateria
         ?.toLowerCase()
         .includes(filters.nombreMateria.toLowerCase());
@@ -81,6 +96,22 @@ function MateriasPage() {
         .includes(filters.comision.toLowerCase());
 
       return matchNombre && matchDocente && matchComision;
+    });
+
+    // 2) Ordeno por comisión (curso) y luego nombre de materia
+    return [...filtradas].sort((a, b) => {
+      const ca = parseCurso(a.comision);
+      const cb = parseCurso(b.comision);
+
+      // Primero por año
+      if (ca.anio !== cb.anio) return ca.anio - cb.anio;
+      // Luego por letra de curso
+      if (ca.letra !== cb.letra) return ca.letra.localeCompare(cb.letra);
+
+      // Y dentro de la misma comisión, por nombre de materia
+      const nombreA = (a.nombreMateria || "").toLowerCase();
+      const nombreB = (b.nombreMateria || "").toLowerCase();
+      return nombreA.localeCompare(nombreB);
     });
   }, [materias, comisiones, filters, isAdmin, user]);
 
@@ -124,7 +155,8 @@ function MateriasPage() {
       ),
       dataIndex: "nombreMateria",
       key: "nombreMateria",
-      sorter: (a, b) => a.nombreMateria.localeCompare(b.nombreMateria),
+      sorter: (a, b) =>
+        (a.nombreMateria || "").localeCompare(b.nombreMateria || ""),
       sortDirections: ["ascend", "descend"],
       render: (text) => <span>{text}</span>,
     },
@@ -162,10 +194,13 @@ function MateriasPage() {
       ),
       dataIndex: "comision",
       key: "comision",
-      sorter: (a, b) =>
-        (a.comision || "")
-          .toString()
-          .localeCompare((b.comision || "").toString()),
+      sorter: (a, b) => {
+        const ca = parseCurso(a.comision);
+        const cb = parseCurso(b.comision);
+
+        if (ca.anio !== cb.anio) return ca.anio - cb.anio;
+        return ca.letra.localeCompare(cb.letra);
+      },
       sortDirections: ["ascend", "descend"],
     },
   ];

@@ -117,10 +117,16 @@ function ComisionesFormPage() {
             label={
               <span>
                 <span className="text-red-500">*</span> Curso
-              </span>
+                </span>
             }
             name="curso"
-            rules={[{ required: true, message: "Ingresá el curso (A, B...)" }]}
+            rules={[
+              { required: true, message: "Ingresá el curso (A, B...)" },
+              {
+                pattern: /^[A-Za-z]$/,
+                message: "El curso debe ser una letra (A, B, C...)",
+              },
+            ]}
           >
             <Input maxLength={1} placeholder="A, B, C..." />
           </Form.Item>

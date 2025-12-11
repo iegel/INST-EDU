@@ -4,6 +4,21 @@ import { Popconfirm, Space, Table, Input, Button, message, Tag } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { promoteAlumnosRequest } from "../api/alumnos";
 
+// Función para convertir "1A", "2C", etc. en { anio: 1, letra: "A" }
+const parseCurso = (value) => {
+  if (!value) return { anio: 999, letra: "" };
+
+  const str = value.toString().trim();
+  const match = str.match(/^(\d+)\s*([A-Za-z])$/);
+
+  if (!match) return { anio: 999, letra: str.toUpperCase() };
+
+  return {
+    anio: parseInt(match[1], 10),
+    letra: match[2].toUpperCase(),
+  };
+};
+
 function AlumnosPage() {
   // Traigo funciones y datos del contexto de alumnos
   const { getAlumnos, deleteAlumno, alumnos } = useAlumnos();
@@ -37,7 +52,8 @@ function AlumnosPage() {
   // Aplico filtros en memoria sobre la lista de alumnos
   const filteredAlumnos = useMemo(() => {
     if (!alumnos) return [];
-    return alumnos.filter((a) => {
+
+    const filtrados = alumnos.filter((a) => {
       const matchNombre = a.nombre
         ?.toLowerCase()
         .includes(filters.nombre.toLowerCase());
@@ -52,12 +68,26 @@ function AlumnosPage() {
         .includes(filters.dni.toLowerCase());
 
       const matchComision = (a.comision || "")
-        .toString()
         .toLowerCase()
         .includes(filters.comision.toLowerCase());
 
       return matchNombre && matchApellido && matchDni && matchComision;
     });
+
+  return [...filtrados].sort((a, b) => {
+    const ca = parseCurso(a.comision);
+    const cb = parseCurso(b.comision);
+
+    // Primero ordeno por año
+    if (ca.anio !== cb.anio) return ca.anio - cb.anio;
+
+    // Luego ordeno por letra del curso
+    if (ca.letra !== cb.letra) return ca.letra.localeCompare(cb.letra);
+
+    // Y dentro del curso ordeno por apellido
+    return a.apellido.localeCompare(b.apellido);
+  });
+
   }, [alumnos, filters]);
 
   // Configuración de selección múltiple de filas
@@ -136,7 +166,6 @@ function AlumnosPage() {
       dataIndex: "nombre",
       key: "nombre",
       sorter: (a, b) => a.nombre.localeCompare(b.nombre),
-      sortDirections: ["ascend", "descend"],
     },
     {
       title: (
@@ -153,7 +182,6 @@ function AlumnosPage() {
       dataIndex: "apellido",
       key: "apellido",
       sorter: (a, b) => a.apellido.localeCompare(b.apellido),
-      sortDirections: ["ascend", "descend"],
     },
     {
       title: (
@@ -170,7 +198,6 @@ function AlumnosPage() {
       dataIndex: "dni",
       key: "dni",
       sorter: (a, b) => Number(a.dni) - Number(b.dni),
-      sortDirections: ["ascend", "descend"],
     },
     {
       title: (
@@ -186,11 +213,15 @@ function AlumnosPage() {
       ),
       dataIndex: "comision",
       key: "comision",
-      sorter: (a, b) =>
-        (a.comision || "")
-          .toString()
-          .localeCompare((b.comision || "").toString()),
-      sortDirections: ["ascend", "descend"],
+
+      // Ordena 1A,1B,2A,2B
+      sorter: (a, b) => {
+        const ca = parseCurso(a.comision);
+        const cb = parseCurso(b.comision);
+
+        if (ca.anio !== cb.anio) return ca.anio - cb.anio;
+        return ca.letra.localeCompare(cb.letra);
+      },
     },
 
     // Promedio del boletín actual (calculado en el backend)
@@ -224,7 +255,6 @@ function AlumnosPage() {
       render: (egresado) =>
         egresado ? <Tag color="blue">Egresado</Tag> : null,
       sorter: (a, b) => Number(a.egresado) - Number(b.egresado),
-      sortDirections: ["ascend", "descend"],
     },
 
     // Acciones por fila: editar, boletín, borrar
@@ -239,8 +269,8 @@ function AlumnosPage() {
             title="¿Estás seguro de borrar este alumno?"
             okText="Sí"
             cancelText="No"
-            okButtonProps={{ type: "primary", danger: true }}
             onConfirm={() => deleteAlumno(record._id)}
+            okButtonProps={{ type: "primary", danger: true }}
           >
             <a>Borrar</a>
           </Popconfirm>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useMaterias } from "../context/MateriasContext";
 import { useComisiones } from "../context/ComisionesContext";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,7 +19,17 @@ const MateriasFormPage = () => {
   // Al iniciar el componente, cargo las comisiones para completar el selector de cursos
   useEffect(() => {
     getComisiones();
-  }, [getComisiones]);
+  }, []);
+  // Ordeno las comisiones por año y luego por letra de curso (1A,1B,2A...)
+  const comisionesOrdenadas = useMemo(() => {
+    if (!comisiones) return [];
+    return [...comisiones].sort((a, b) => {
+      if (a.anio !== b.anio) return a.anio - b.anio;
+      const cursoA = (a.curso || "").toString().toUpperCase();
+      const cursoB = (b.curso || "").toString().toUpperCase();
+      return cursoA.localeCompare(cursoB);
+    });
+  }, [comisiones]);
 
   // Si es edición, cargo la materia desde el backend y completo el form
   useEffect(() => {
@@ -122,12 +132,8 @@ const MateriasFormPage = () => {
             rules={[{ required: true, message: "Curso obligatorio" }]}
           >
             <Select placeholder="Seleccioná un curso">
-              {comisiones.map((c) => (
-                <Option
-                  key={c._id}
-                  value={c.numeroComision}
-                  // Si en la materia guardaras el ObjectId, sería: value={c._id}
-                >
+              {comisionesOrdenadas.map((c) => (
+                <Option key={c._id} value={c.numeroComision}>
                   {`${c.anio}° año - Curso ${c.curso}`}
                 </Option>
               ))}
