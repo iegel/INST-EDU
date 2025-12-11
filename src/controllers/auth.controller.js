@@ -8,6 +8,14 @@ import Comision from '../models/comision.model.js';
 // Registro de usuario nuevo
 export const register = async (req, res) => {
   try {
+
+    const currentUser = await User.findById(req.user.id);
+    if (!currentUser || currentUser.role !== "Admin") {
+      return res
+        .status(403)
+        .json({ message: "Acceso denegado. Solo Admin puede crear usuarios." });
+    }
+    
     const { username, email, password, role, isActive } = req.body;
     // En este punto el body ya pasó por el esquema de Zod (validaciones básicas)
 

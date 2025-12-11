@@ -7,7 +7,7 @@ const router = Router()
 
 // Registro de usuario nuevo.
 // Antes de llegar al controlador, se valida el cuerpo del request con Zod.
-router.post("/register", validateSchema(registerSchema), register);
+router.post("/register", validateSchema(registerSchema),authRequired, register);
 
 // Login del usuario.
 // También se valida primero el formato de email y password.
