@@ -1,5 +1,6 @@
 import Materia from '../models/materia.model.js'
 import User from '../models/user.model.js'
+import Comision from "../models/comision.model.js";
 
 // Obtengo todas las materias guardadas en la base
 export const getMaterias = async (req, res) => {
@@ -15,36 +16,48 @@ export const getMaterias = async (req, res) => {
 
 // Creo una nueva materia
 export const createMateria = async (req, res) => {
-    try {
+  try {
+    const currentUser = await User.findById(req.user.id);
 
-        // Usuario que hace la petición (viene del token)
-        const currentUser = await User.findById(req.user.id);
-
-        // Si no existe o no es Admin, no lo dejo continuar
-        if (!currentUser || currentUser.role !== "Admin") {
-        return res.status(403).json({
-            message: "Solo un administrador puede crear materias",
-        });
-        }
-
-        // Desestructuro los datos que vienen del formulario del front
-        const { nombreMateria, docente, comision } = req.body
-
-        // Armo el objeto como lo espera el modelo de Mongoose
-        const newMateria = new Materia({
-            nombreMateria,
-            docente,
-            comision,
-        })
-
-        // Guardo en Mongo y devuelvo la materia creada
-        const savedMateria = await newMateria.save()
-        res.json(savedMateria)
-
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: "Error en la creación de la materia" })
+    if (!currentUser || currentUser.role !== "Admin") {
+      return res.status(403).json({
+        message: "Solo un administrador puede crear materias",
+      });
     }
+
+    const { nombreMateria, docente, comision } = req.body;
+
+    if (!nombreMateria || !docente || !comision) {
+      return res.status(400).json({
+        message: "Nombre de materia, docente y comisión son obligatorios",
+      });
+    }
+
+    // Validar que la comisión exista
+    const existeComision = await Comision.findOne({
+      numeroComision: comision,
+    });
+
+    if (!existeComision) {
+      return res.status(400).json({
+        message: "La comisión indicada no existe",
+      });
+    }
+
+    const newMateria = new Materia({
+      nombreMateria,
+      docente,
+      comision,
+    });
+
+    const savedMateria = await newMateria.save();
+    return res.json(savedMateria);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Error en la creación de la materia" });
+  }
 };
 
 
@@ -68,32 +81,43 @@ export const getMateria = async (req, res) => {
 
 // Actualizo una materia por ID
 export const updateMateria = async (req, res) => {
-    try {
-
-        // Valido que el usuario sea Admin
-        const currentUser = await User.findById(req.user.id);
-        if (!currentUser || currentUser.role !== "Admin") {
-        return res.status(403).json({
-            message: "Solo un administrador puede editar materias",
-        });
-        }
-        
-        const materia = await Materia.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            {
-                new: true, // new:true hace que me devuelva la materia actualizada
-            }
-        )
-
-        // Si no existe, mando error
-        if (!materia) return res.status(404).json({ message: "Materia no encontrada" })
-
-        res.json(materia)
-
-    } catch (error) {
-        return res.status(404).json({ message: "Materia no encontrada" })
+  try {
+    const currentUser = await User.findById(req.user.id);
+    if (!currentUser || currentUser.role !== "Admin") {
+      return res.status(403).json({
+        message: "Solo un administrador puede editar materias",
+      });
     }
+
+    const { comision } = req.body;
+
+    // Si quieren cambiar la comisión, valido que exista
+    if (comision) {
+      const existeComision = await Comision.findOne({
+        numeroComision: comision,
+      });
+
+      if (!existeComision) {
+        return res.status(400).json({
+          message: "La comisión indicada no existe",
+        });
+      }
+    }
+
+    const materia = await Materia.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!materia)
+      return res.status(404).json({ message: "Materia no encontrada" });
+
+    return res.json(materia);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error al actualizar la materia" });
+  }
 };
 
 
