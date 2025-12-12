@@ -33,8 +33,9 @@ export const getAlumnos = async (req, res) => {
       // Me quedo con el número de comisión (1A, 2B, etc.)
       const cursos = comisiones.map((c) => c.numeroComision);
 
-      // Filtro alumnos que pertenecen a esas comisiones
+      // Filtro alumnos que pertenecen a esas comisiones y que no esten egresados
       filtro.comision = { $in: cursos };
+      filtro.egresado = { $ne: true };
     }
 
     // Si es Admin, filtro queda vacío y trae todos
@@ -68,11 +69,15 @@ export const createAlumno = async (req, res) => {
   try {
     const { nombre, apellido, dni, comision, egresado } = req.body;
 
-    // Validación simple por si algo se escapó del esquema
     if (!nombre || !apellido || !dni || !comision) {
       return res.status(400).json({
         message: "Nombre, apellido, DNI y comisión son obligatorios",
       });
+    }
+
+    const existeComision = await Comision.findOne({ numeroComision: comision });
+    if (!existeComision) {
+      return res.status(400).json({ message: "La comisión indicada no existe" });
     }
 
     const newAlumno = new Alumno({
@@ -80,12 +85,10 @@ export const createAlumno = async (req, res) => {
       apellido,
       dni,
       comision,
-      // Por defecto egresado es false, pero se puede sobreescribir
       egresado: egresado ?? false,
     });
 
     await newAlumno.save();
-
     return res.status(201).json(newAlumno);
   } catch (error) {
     console.error("Error al crear alumno:", error);
@@ -111,15 +114,19 @@ export const getAlumno = async (req, res) => {
       return res.status(404).json({ message: "Alumno no encontrado" });
     }
 
-    // Si es Preceptor, validamos que el alumno sea de alguna de sus comisiones
+    // Si es Preceptor, validamos que el alumno sea de alguna de sus comisiones y que no esté egresado
     if (user.role === "Preceptor") {
+      if (alumno.egresado) {
+        return res.status(403).json({
+          message: "No tiene permiso para ver alumnos egresados",
+        });
+      }
+
       const comisiones = await Comision.find({ preceptor: user._id });
       const cursos = comisiones.map((c) => c.numeroComision);
 
       if (!cursos.includes(alumno.comision)) {
-        return res.status(403).json({
-          message: "No tiene permiso para ver este alumno",
-        });
+        return res.status(403).json({ message: "No tiene permiso para ver este alumno" });
       }
     }
 
@@ -147,7 +154,13 @@ export const updateAlumno = async (req, res) => {
     alumno.nombre = nombre ?? alumno.nombre;
     alumno.apellido = apellido ?? alumno.apellido;
     alumno.dni = dni ?? alumno.dni;
-    if (comision) alumno.comision = comision;
+    if (comision) {
+      const existeComision = await Comision.findOne({ numeroComision: comision });
+      if (!existeComision) {
+        return res.status(400).json({ message: "La comisión indicada no existe" });
+      }
+      alumno.comision = comision;
+    }
 
     if (typeof egresado === "boolean") {
       alumno.egresado = egresado;

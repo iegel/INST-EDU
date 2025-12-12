@@ -12,31 +12,36 @@ export const getBoletinAlumno = async (req, res) => {
   try {
     const { alumnoId } = req.params;
     const yearQuery = req.query.year ? Number(req.query.year) : null;
-    const comisionQuery = req.query.comision || null;
+    const comisionQuery = req.query.comision ? String(req.query.comision) : null;
 
     // Usuario logueado (viene del token)
     const userId = req.user.id;
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(401).json({ message: "Usuario no encontrado" });
-    }
+    if (!user) return res.status(401).json({ message: "Usuario no encontrado" });
 
-    // Verificamos que el alumno exista
+    // Verifico que el alumno exista
     const alumno = await Alumno.findById(alumnoId);
-    if (!alumno) {
-      return res.status(404).json({ message: "Alumno no encontrado" });
+    if (!alumno) return res.status(404).json({ message: "Alumno no encontrado" });
+
+    // Si el frontend pide una comisión específica, valido que exista
+    if (comisionQuery) {
+      const existeComision = await Comision.findOne({ numeroComision: comisionQuery });
+      if (!existeComision) {
+        return res.status(400).json({ message: "La comisión solicitada no existe" });
+      }
     }
 
-    // Si es Preceptor, valido que el alumno sea de alguna de sus comisiones
+    // Si es Preceptor, valido permisos
     if (user.role === "Preceptor") {
-      const comisionesPreceptor = await Comision.find({
-        preceptor: user._id,
-      });
+      const comisionesPreceptor = await Comision.find({ preceptor: user._id });
       const cursos = comisionesPreceptor.map((c) => c.numeroComision);
 
-      if (!cursos.includes(alumno.comision)) {
+      // Si pide un boletín de otra comisión (histórico), también lo controlo
+      const comisionARevisar = comisionQuery || alumno.comision;
+
+      if (!cursos.includes(comisionARevisar)) {
         return res.status(403).json({
-          message: "No tiene permiso para ver el boletín de este alumno",
+          message: "No tiene permiso para ver el boletín de esta comisión",
         });
       }
     }
@@ -45,7 +50,7 @@ export const getBoletinAlumno = async (req, res) => {
     // Cálculo de ciclos disponibles y boletín actual
     // --------------------------
 
-    // Buscamos todos los ciclos lectivos y comisiones donde el alumno tiene notas
+    // Busco todos los ciclos lectivos y comisiones donde el alumno tiene notas
     const ciclosRaw = await Calificacion.aggregate([
       {
         $match: {
@@ -61,9 +66,7 @@ export const getBoletinAlumno = async (req, res) => {
     ]);
 
     const ciclosDisponibles = ciclosRaw
-      .filter(
-        (c) => c._id.cicloLectivo != null && c._id.comision != null
-      )
+      .filter((c) => c._id.cicloLectivo != null && c._id.comision != null)
       .map((c) => ({
         cicloLectivo: c._id.cicloLectivo,
         comision: c._id.comision,
@@ -73,38 +76,38 @@ export const getBoletinAlumno = async (req, res) => {
     let comisionSeleccionada = null;
 
     if (yearQuery && comisionQuery) {
-      // Si el frontend pide un boletín concreto (año + comisión)
+      // Modo boletín puntual (año + comisión)
       cicloSeleccionado = yearQuery;
       comisionSeleccionada = comisionQuery;
     } else {
-      // MODO "BOLETÍN ACTUAL":
-      // Busco todos los ciclos de la comisión actual del alumno
+      // Modo "boletín actual": el más reciente en la comisión actual del alumno
       const ciclosDeComisionActual = ciclosDisponibles.filter(
         (c) => c.comision === alumno.comision
       );
 
       if (ciclosDeComisionActual.length > 0) {
-        // Tomo el ciclo más reciente
-        const maxYear = Math.max(
-          ...ciclosDeComisionActual.map((c) => c.cicloLectivo)
-        );
+        const maxYear = Math.max(...ciclosDeComisionActual.map((c) => c.cicloLectivo));
         cicloSeleccionado = maxYear;
         comisionSeleccionada = alumno.comision;
       } else {
-        // No hay boletines cargados aún en esa comisión
         cicloSeleccionado = null;
         comisionSeleccionada = alumno.comision;
       }
     }
 
+    // Validación extra: la comisión seleccionada debe existir (por si alumno.comision quedó mal cargada)
+    if (comisionSeleccionada) {
+      const existeComision = await Comision.findOne({ numeroComision: comisionSeleccionada });
+      if (!existeComision) {
+        return res.status(400).json({ message: "La comisión del boletín no existe" });
+      }
+    }
+
     // Traigo las materias de la comisión seleccionada
-    const materias = await Materia.find({
-      comision: comisionSeleccionada,
-    });
+    const materias = await Materia.find({ comision: comisionSeleccionada });
 
     let calificaciones = [];
     if (cicloSeleccionado !== null) {
-      // Traigo las calificaciones del alumno para ese ciclo+comisión
       calificaciones = await Calificacion.find({
         alumno: alumnoId,
         cicloLectivo: cicloSeleccionado,
@@ -122,9 +125,7 @@ export const getBoletinAlumno = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al obtener boletín:", error);
-    res
-      .status(500)
-      .json({ message: "Error al obtener el boletín del alumno" });
+    return res.status(500).json({ message: "Error al obtener el boletín del alumno" });
   }
 };
 
@@ -137,63 +138,57 @@ export const guardarBoletinAlumno = async (req, res) => {
     const { cicloLectivo, calificaciones, comision: comisionBody } = req.body;
 
     if (!cicloLectivo) {
-      return res
-        .status(400)
-        .json({ message: "El ciclo lectivo es obligatorio" });
+      return res.status(400).json({ message: "El ciclo lectivo es obligatorio" });
     }
 
     if (!Array.isArray(calificaciones)) {
-      return res
-        .status(400)
-        .json({ message: "Las calificaciones deben venir en un array" });
+      return res.status(400).json({ message: "Las calificaciones deben venir en un array" });
     }
 
     // Usuario logueado
     const userId = req.user.id;
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(401).json({ message: "Usuario no encontrado" });
-    }
+    if (!user) return res.status(401).json({ message: "Usuario no encontrado" });
 
     const alumno = await Alumno.findById(alumnoId);
-    if (!alumno) {
-      return res.status(404).json({ message: "Alumno no encontrado" });
+    if (!alumno) return res.status(404).json({ message: "Alumno no encontrado" });
+
+    // Restricción: un alumno egresado no puede recibir nuevos boletines
+    if (alumno.egresado) {
+      return res.status(400).json({
+        message: "El alumno está egresado. Solo se pueden consultar boletines anteriores.",
+      });
     }
 
-    // Si es Preceptor → solo puede modificar boletines de sus alumnos
+    // Comisión a usar para el boletín
+    const comisionBoletin = comisionBody || alumno.comision;
+
+    // Validar que la comisión exista
+    const existeComision = await Comision.findOne({ numeroComision: comisionBoletin });
+    if (!existeComision) {
+      return res.status(400).json({ message: "La comisión del boletín no existe" });
+    }
+
+    // Si es Preceptor → solo puede modificar boletines de comisiones asignadas
     if (user.role === "Preceptor") {
-      const comisionesPreceptor = await Comision.find({
-        preceptor: user._id,
-      });
+      const comisionesPreceptor = await Comision.find({ preceptor: user._id });
       const cursos = comisionesPreceptor.map((c) => c.numeroComision);
 
-      if (!cursos.includes(alumno.comision)) {
+      if (!cursos.includes(comisionBoletin)) {
         return res.status(403).json({
-          message:
-            "No tiene permiso para modificar el boletín de este alumno",
+          message: "No tiene permiso para modificar boletines de esta comisión",
         });
       }
     }
 
-    //  Restricción: un alumno egresado no puede recibir nuevos boletines
-    if (alumno.egresado) {
-      return res.status(400).json({
-        message:
-          "El alumno está egresado. Solo se pueden consultar boletines anteriores.",
-      });
-    }
-
-    // Comisión a usar para el boletín: la que viene en el body o la comisión actual del alumno
-    const comisionBoletin = comisionBody || alumno.comision;
-
-    // Primero borro las calificaciones previas de ese ciclo+comisión
+    // Borro calificaciones previas de ese ciclo+comisión
     await Calificacion.deleteMany({
       alumno: alumnoId,
       cicloLectivo,
       comision: comisionBoletin,
     });
 
-    // Preparo los documentos a insertar
+    // Preparo documentos a insertar
     const docs = calificaciones.map((c) => ({
       alumno: alumnoId,
       materia: c.materiaId,
@@ -212,9 +207,7 @@ export const guardarBoletinAlumno = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al guardar boletín:", error);
-    return res
-      .status(500)
-      .json({ message: "Error al guardar el boletín del alumno" });
+    return res.status(500).json({ message: "Error al guardar el boletín del alumno" });
   }
 };
 
@@ -224,21 +217,32 @@ export const getHistorialBoletinAlumno = async (req, res) => {
   try {
     const { alumnoId } = req.params;
 
+    // Usuario logueado
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user) return res.status(401).json({ message: "Usuario no encontrado" });
+
     const alumno = await Alumno.findById(alumnoId);
-    if (!alumno) {
-      return res.status(404).json({ message: "Alumno no encontrado" });
+    if (!alumno) return res.status(404).json({ message: "Alumno no encontrado" });
+
+    // Permisos para Preceptor (evita que vea historial de cualquiera)
+    if (user.role === "Preceptor") {
+      const comisionesPreceptor = await Comision.find({ preceptor: user._id });
+      const cursos = comisionesPreceptor.map((c) => c.numeroComision);
+
+      if (!cursos.includes(alumno.comision)) {
+        return res.status(403).json({
+          message: "No tiene permiso para ver el historial de este alumno",
+        });
+      }
     }
 
-    // Traigo todas las calificaciones del alumno, ordenadas por año y trimestre
-    const calificaciones = await Calificacion.find({
-      alumno: alumnoId,
-    })
+    const calificaciones = await Calificacion.find({ alumno: alumnoId })
       .populate("materia")
       .sort({ cicloLectivo: -1, trimestre: 1 });
 
     const historial = [];
 
-    // Agrupo por cicloLectivo + comision
     for (const cal of calificaciones) {
       const ciclo = cal.cicloLectivo || "Sin ciclo";
       const comision = cal.comision || "Sin comisión";
@@ -248,21 +252,14 @@ export const getHistorialBoletinAlumno = async (req, res) => {
       );
 
       if (!grupo) {
-        grupo = {
-          cicloLectivo: ciclo,
-          comision,
-          calificaciones: [],
-        };
+        grupo = { cicloLectivo: ciclo, comision, calificaciones: [] };
         historial.push(grupo);
       }
 
       grupo.calificaciones.push(cal);
     }
 
-    return res.json({
-      alumno,
-      historial,
-    });
+    return res.json({ alumno, historial });
   } catch (error) {
     console.error("Error al obtener historial de boletines:", error);
     return res.status(500).json({
